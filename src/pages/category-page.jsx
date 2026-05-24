@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useCategoryMovies } from '../hooks/use-categories.js'
 import MovieGrid from '../components/movie/movie-grid.jsx'
@@ -8,6 +8,10 @@ export default function CategoryPage() {
   const { slug } = useParams()
   const [page, setPage] = useState(1)
   const { movies, pagination, categoryInfo, loading, error } = useCategoryMovies(slug, page)
+
+  useEffect(() => {
+    document.title = categoryInfo ? `${categoryInfo} - VibePHim` : 'Thể loại - VibePHim'
+  }, [categoryInfo])
 
   const totalPages = pagination ? Math.ceil(pagination.totalItems / pagination.totalItemsPerPage) : 1
 

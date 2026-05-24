@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useRef } from 'react'
+import { useMemo, useCallback, useRef, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMovieDetail } from '../hooks/use-movie-detail.js'
 import { useWatchHistory } from '../contexts/watch-history-context.jsx'
@@ -26,6 +26,10 @@ export default function WatchPage() {
   const currentEp = useMemo(() => findEpisode(episodes, ep), [episodes, ep])
   const videoSrc = currentEp?.link_m3u8 || ''
   const playerTitle = movie ? `${movie.name}${currentEp?.name ? ` — ${currentEp.name}` : ''}` : ''
+
+  useEffect(() => {
+    if (movie) document.title = `${movie.name}${currentEp?.name ? ` — ${currentEp.name}` : ''} - VibePHim`
+  }, [movie, currentEp])
   const initialTime = movie ? getProgress(slug, ep) : 0
 
   const firstServer = episodes[0]?.server_data || []

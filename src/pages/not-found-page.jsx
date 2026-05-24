@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 export default function NotFoundPage() {
+  useEffect(() => { document.title = '404 - VibePHim' }, [])
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-center px-6">
       <p className="text-8xl font-black select-none mb-6" style={{ color: 'var(--bg-4)' }}>404</p>

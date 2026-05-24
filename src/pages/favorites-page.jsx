@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useFavorites } from '../contexts/favorites-context.jsx'
 import { getImageUrl } from '../services/ophim-api.js'
@@ -84,6 +85,7 @@ function FavoriteCard({ movie, onRemove }) {
 
 export default function FavoritesPage() {
   const { favorites, removeFavorite, clearFavorites } = useFavorites()
+  useEffect(() => { document.title = 'Yêu thích - VibePHim' }, [])
 
   return (
     <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>

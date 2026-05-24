@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useCountryMovies } from '../hooks/use-categories.js'
 import MovieGrid from '../components/movie/movie-grid.jsx'
@@ -8,6 +8,10 @@ export default function CountryPage() {
   const { slug } = useParams()
   const [page, setPage] = useState(1)
   const { movies, pagination, countryInfo, loading, error } = useCountryMovies(slug, page)
+
+  useEffect(() => {
+    document.title = countryInfo ? `${countryInfo} - VibePHim` : 'Quốc gia - VibePHim'
+  }, [countryInfo])
 
   const totalPages = pagination ? Math.ceil(pagination.totalItems / pagination.totalItemsPerPage) : 1
 

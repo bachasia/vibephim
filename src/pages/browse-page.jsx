@@ -110,6 +110,8 @@ export default function BrowsePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  useEffect(() => { document.title = 'Duyệt phim - VibePHim' }, [])
+
   const hasFilters = !!(type || category || country || year)
 
   const categoryOptions = [

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useWatchHistory } from '../contexts/watch-history-context.jsx'
 import { getImageUrl } from '../services/ophim-api.js'
@@ -136,6 +137,7 @@ function HistoryItem({ entry }) {
 
 export default function HistoryPage() {
   const { history, clearHistory } = useWatchHistory()
+  useEffect(() => { document.title = 'Lịch sử xem - VibePHim' }, [])
 
   return (
     <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>
