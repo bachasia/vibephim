@@ -30,9 +30,9 @@ function HistoryItem({ entry }) {
 
   return (
     <div
-      className="flex gap-5 transition-colors duration-200"
+      className="flex gap-3 transition-colors duration-200"
       style={{
-        padding: '20px',
+        padding: '12px',
         background: 'var(--bg-color)',
         borderRadius: '4px',
         border: '1px solid rgba(255,255,255,0.1)',
@@ -44,7 +44,7 @@ function HistoryItem({ entry }) {
       <Link
         to={`/xem/${slug}/${episode}`}
         className="flex-shrink-0 overflow-hidden rounded-sm"
-        style={{ width: '128px', aspectRatio: '16/9', background: 'var(--bg-2)' }}
+        style={{ width: '112px', aspectRatio: '16/9', background: 'var(--bg-2)' }}
       >
         <img
           src={getImageUrl(thumb_url)}
@@ -56,16 +56,16 @@ function HistoryItem({ entry }) {
         />
       </Link>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0 flex flex-col gap-2">
+      {/* Info + button stacked — avoids 3-column squeeze on mobile */}
+      <div className="flex-1 min-w-0 flex flex-col gap-1.5">
         <Link
           to={`/phim/${slug}`}
-          className="text-base font-bold text-white hover:underline line-clamp-1"
+          className="text-sm font-bold text-white hover:underline line-clamp-2"
         >
           {name}
         </Link>
         {episodeName && (
-          <p className="text-sm" style={{ color: '#b3b3b3' }}>{episodeName}</p>
+          <p className="text-xs" style={{ color: '#b3b3b3' }}>{episodeName}</p>
         )}
 
         {/* Progress bar */}
@@ -79,57 +79,56 @@ function HistoryItem({ entry }) {
           />
         </div>
 
-        {/* Meta */}
-        <div className="flex gap-5 font-mono text-[11px]" style={{ color: '#737373' }}>
-          {progress != null && (
-            <span>{formatTime(progress)}{duration ? ` / ${formatTime(duration)}` : ''}</span>
-          )}
-          <span>{timeAgo(watchedAt)}</span>
-        </div>
-      </div>
+        {/* Meta + button row */}
+        <div className="flex items-center justify-between gap-2 mt-auto">
+          <div className="flex gap-3 font-mono text-[10px]" style={{ color: '#737373' }}>
+            {progress != null && (
+              <span>{formatTime(progress)}{duration ? ` / ${formatTime(duration)}` : ''}</span>
+            )}
+            <span>{timeAgo(watchedAt)}</span>
+          </div>
 
-      {/* Continue button */}
-      <div className="flex items-end flex-shrink-0">
-        <Link
-          to={`/xem/${slug}/${episode}`}
-          className="text-sm font-bold whitespace-nowrap transition-all duration-200"
-          style={done
-            ? {
-                padding: '8px 16px',
-                border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: '4px',
-                color: '#b3b3b3',
-                background: 'transparent',
-              }
-            : {
-                padding: '8px 16px',
-                border: '1px solid var(--primary)',
-                borderRadius: '4px',
-                color: 'var(--primary)',
-                background: 'rgba(255,216,117,0.1)',
-              }
-          }
-          onMouseEnter={(e) => {
-            if (done) {
-              e.currentTarget.style.background = 'var(--bg-3)'
-              e.currentTarget.style.color = '#fff'
-            } else {
-              e.currentTarget.style.background = 'var(--primary)'
-              e.currentTarget.style.color = '#fff'
+          <Link
+            to={`/xem/${slug}/${episode}`}
+            className="text-xs font-bold whitespace-nowrap flex-shrink-0 transition-all duration-200"
+            style={done
+              ? {
+                  padding: '5px 10px',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '4px',
+                  color: '#b3b3b3',
+                  background: 'transparent',
+                }
+              : {
+                  padding: '5px 10px',
+                  border: '1px solid var(--primary)',
+                  borderRadius: '4px',
+                  color: 'var(--primary)',
+                  background: 'rgba(255,216,117,0.1)',
+                }
             }
-          }}
-          onMouseLeave={(e) => {
-            if (done) {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.color = '#b3b3b3'
-            } else {
-              e.currentTarget.style.background = 'rgba(229,9,20,0.12)'
-              e.currentTarget.style.color = 'var(--primary)'
-            }
-          }}
-        >
-          ▶ {done ? 'Xem lại' : 'Tiếp tục'}
-        </Link>
+            onMouseEnter={(e) => {
+              if (done) {
+                e.currentTarget.style.background = 'var(--bg-3)'
+                e.currentTarget.style.color = '#fff'
+              } else {
+                e.currentTarget.style.background = 'var(--primary)'
+                e.currentTarget.style.color = '#fff'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (done) {
+                e.currentTarget.style.background = 'transparent'
+                e.currentTarget.style.color = '#b3b3b3'
+              } else {
+                e.currentTarget.style.background = 'rgba(255,216,117,0.1)'
+                e.currentTarget.style.color = 'var(--primary)'
+              }
+            }}
+          >
+            ▶ {done ? 'Xem lại' : 'Tiếp tục'}
+          </Link>
+        </div>
       </div>
     </div>
   )
@@ -143,11 +142,17 @@ export default function HistoryPage() {
     <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>
       {/* Page title bar */}
       <div
-        className="flex items-center justify-between px-8 pt-24 pb-5"
+        className="flex items-center justify-between px-4 sm:px-8 pt-24 pb-5"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
       >
         <div>
-          <h1 className="text-2xl font-bold">⏱ Lịch Sử Xem</h1>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            Lịch Sử Xem
+          </h1>
           <p className="text-sm mt-2 font-mono" style={{ color: '#b3b3b3' }}>
             {history.length} phim đã xem
           </p>
@@ -155,9 +160,9 @@ export default function HistoryPage() {
         {history.length > 0 && (
           <button
             onClick={clearHistory}
-            className="text-sm transition-all duration-200"
+            className="text-xs transition-all duration-200"
             style={{
-              padding: '8px 16px',
+              padding: '5px 10px',
               border: '1px solid rgba(255,216,117,0.4)',
               borderRadius: '2px',
               background: 'transparent',
@@ -180,7 +185,7 @@ export default function HistoryPage() {
           </Link>
         </div>
       ) : (
-        <div className="px-8 py-5 flex flex-col gap-3 pb-16">
+        <div className="px-4 sm:px-8 py-5 flex flex-col gap-3 pb-16">
           {history.map((entry) => (
             <HistoryItem key={`${entry.slug}-${entry.episode}`} entry={entry} />
           ))}

@@ -23,17 +23,17 @@ const YEAR_OPTIONS = [
 ]
 
 const SELECT_STYLE = {
-  padding: '8px 32px 8px 12px',
+  padding: '6px 28px 6px 10px',
   background: 'var(--bg-3)',
   border: '1px solid rgba(255,255,255,0.2)',
   borderRadius: '2px',
   color: '#ffffff',
-  fontSize: '14px',
+  fontSize: '13px',
   appearance: 'none',
   WebkitAppearance: 'none',
   backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b3b3b3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\")",
   backgroundRepeat: 'no-repeat',
-  backgroundPosition: 'right 8px center',
+  backgroundPosition: 'right 6px center',
   cursor: 'pointer',
   fontFamily: 'inherit',
   outline: 'none',
@@ -127,7 +127,7 @@ export default function BrowsePage() {
     <div className="min-h-screen text-white" style={{ background: '#000' }}>
       {/* Section header */}
       <div
-        className="flex items-end justify-between px-8 pt-24 pb-0"
+        className="flex items-end justify-between px-4 sm:px-8 pt-24 pb-0"
         style={{ marginBottom: '20px' }}
       >
         <div>
@@ -140,7 +140,7 @@ export default function BrowsePage() {
 
       {/* Sticky filter bar */}
       <div
-        className="sticky z-10 flex flex-wrap items-center gap-3 px-8 py-3"
+        className="sticky z-10 flex flex-wrap items-center gap-2 px-4 sm:px-8 py-3"
         style={{
           top: '64px',
           background: 'var(--bg-2)',
@@ -188,7 +188,7 @@ export default function BrowsePage() {
 
         {!loading && totalItems > 0 && (
           <span
-            className="ml-auto font-mono text-[11px]"
+            className="hidden sm:inline ml-auto font-mono text-[11px]"
             style={{ color: '#737373' }}
           >
             {movies.length} / {totalItems} phim · trang {page}/{totalPages}
@@ -197,7 +197,7 @@ export default function BrowsePage() {
       </div>
 
       {/* Grid */}
-      <div className="px-8 pt-6 pb-8">
+      <div className="px-4 sm:px-8 pt-6 pb-8">
         <MovieGrid movies={movies} loading={loading} />
         <Pagination currentPage={page} totalPages={totalPages} onPageChange={handlePageChange} />
       </div>

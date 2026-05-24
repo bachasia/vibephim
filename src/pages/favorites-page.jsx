@@ -91,11 +91,16 @@ export default function FavoritesPage() {
     <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>
       {/* Page title bar */}
       <div
-        className="flex items-center justify-between px-8 pt-24 pb-5"
+        className="flex items-center justify-between px-4 sm:px-8 pt-24 pb-5"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
       >
         <div>
-          <h1 className="text-2xl font-bold">♡ Phim Yêu Thích</h1>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+            Phim Yêu Thích
+          </h1>
           <p className="text-sm mt-2 font-mono" style={{ color: '#b3b3b3' }}>
             {favorites.length} phim đã lưu
           </p>
@@ -103,9 +108,9 @@ export default function FavoritesPage() {
         {favorites.length > 0 && (
           <button
             onClick={() => favorites.forEach((m) => removeFavorite(m.slug))}
-            className="text-sm transition-all duration-200"
+            className="text-xs transition-all duration-200 flex-shrink-0"
             style={{
-              padding: '8px 16px',
+              padding: '5px 10px',
               border: '1px solid rgba(255,216,117,0.5)',
               borderRadius: '2px',
               background: 'transparent',
@@ -120,7 +125,7 @@ export default function FavoritesPage() {
       </div>
 
       {/* Grid */}
-      <div className="px-8 py-5 pb-16">
+      <div className="px-4 sm:px-8 py-5 pb-16">
         {favorites.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-sm mb-4" style={{ color: '#737373' }}>Chưa có phim yêu thích nào.</p>
