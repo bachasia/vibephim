@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { MOVIE_TYPES } from '../../utils/constants.js'
 import VibephimLogo from '../ui/vibephim-logo.jsx'
 import NavDropdown from './nav-dropdown.jsx'
+import InlineSearch from '../search/inline-search.jsx'
 
 const CATEGORIES = [
   { label: 'Hành Động', to: '/the-loai/hanh-dong' },
@@ -49,12 +50,8 @@ function isActive(link, pathname, currentType) {
 }
 
 export default function Header() {
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [searchValue, setSearchValue] = useState('')
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const searchInputRef = useRef(null)
-  const navigate = useNavigate()
   const { pathname, search } = useLocation()
   const currentType = new URLSearchParams(search).get('type') || ''
 
@@ -67,10 +64,6 @@ export default function Header() {
   }, [])
 
   useEffect(() => {
-    if (searchOpen) searchInputRef.current?.focus()
-  }, [searchOpen])
-
-  useEffect(() => {
     if (!menuOpen) return
     function onOutside(e) {
       if (!e.target.closest('[data-mobile-menu]')) setMenuOpen(false)
@@ -79,37 +72,27 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', onOutside)
   }, [menuOpen])
 
-  function handleSearchSubmit(e) {
-    e.preventDefault()
-    const q = searchValue.trim()
-    if (!q) return
-    navigate(`/tim-kiem?q=${encodeURIComponent(q)}`)
-    setSearchOpen(false)
-    setSearchValue('')
-  }
-
-  const headerBg = scrolled
-    ? 'rgba(15,17,26,0.97)'
-    : 'linear-gradient(to bottom, rgba(15,17,26,0.92) 0%, transparent 100%)'
-
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
         height: '70px',
-        background: headerBg,
+        background: scrolled ? 'rgba(15,17,26,0.97)' : 'linear-gradient(to bottom, rgba(15,17,26,0.92) 0%, transparent 100%)',
         backdropFilter: scrolled ? 'blur(10px)' : 'none',
         borderBottom: scrolled ? '1px solid var(--border-color)' : 'none',
       }}
     >
-      <div className="h-full px-6 md:px-10 flex items-center gap-4 md:gap-6">
+      <div className="h-full px-4 md:px-8 flex items-center gap-3 md:gap-4">
         {/* Logo */}
         <Link to="/" className="flex-shrink-0">
           <VibephimLogo iconSize={28} fontSize={18} />
         </Link>
 
+        {/* Search bar — always visible */}
+        <InlineSearch className="flex-1 md:flex-none md:w-64 lg:w-80 xl:w-96" />
+
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-0.5 flex-1">
+        <nav className="hidden md:flex items-center gap-0.5 ml-auto flex-shrink-0">
           {NAV_LINKS.map((link) => {
             const active = isActive(link, pathname, currentType)
             return (
@@ -129,45 +112,10 @@ export default function Header() {
           <NavDropdown label="Quốc Gia" items={COUNTRIES} columns={3} />
         </nav>
 
-        {/* Right actions */}
-        <div className="flex items-center gap-1 ml-auto flex-shrink-0">
-          {searchOpen ? (
-            <form onSubmit={handleSearchSubmit} className="flex items-center">
-              <input
-                ref={searchInputRef}
-                type="search"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Escape') { setSearchOpen(false); setSearchValue('') } }}
-                placeholder="Tìm phim, diễn viên..."
-                aria-label="Tìm kiếm"
-                className="w-44 md:w-60 h-9 px-3 text-sm text-white bg-transparent border rounded outline-none transition-colors"
-                style={{ borderColor: 'var(--bg-4)', background: 'var(--bg-2)' }}
-              />
-              <button
-                type="button"
-                onClick={() => { setSearchOpen(false); setSearchValue('') }}
-                className="ml-2 w-8 h-8 flex items-center justify-center transition-colors"
-                style={{ color: 'var(--text-base)' }}
-              >✕</button>
-            </form>
-          ) : (
-            <button
-              onClick={() => setSearchOpen(true)}
-              aria-label="Tìm kiếm"
-              className="w-9 h-9 flex items-center justify-center rounded transition-colors"
-              style={{ color: 'var(--text-base)' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff' }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-base)' }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </button>
-          )}
-
+        {/* Desktop icon actions */}
+        <div className="hidden md:flex items-center gap-1 flex-shrink-0">
           <Link to="/yeu-thich" aria-label="Yêu thích"
-            className="w-9 h-9 hidden md:flex items-center justify-center rounded transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded transition-colors"
             style={{ color: 'var(--text-base)' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)' }}
             onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-base)' }}
@@ -176,9 +124,8 @@ export default function Header() {
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </Link>
-
           <Link to="/lich-su" aria-label="Lịch sử"
-            className="w-9 h-9 hidden md:flex items-center justify-center rounded transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded transition-colors"
             style={{ color: 'var(--text-base)' }}
             onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)' }}
             onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-base)' }}
@@ -187,21 +134,21 @@ export default function Header() {
               <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
             </svg>
           </Link>
-
-          {/* Hamburger (mobile) */}
-          <button
-            data-mobile-menu
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'}
-            className="md:hidden w-9 h-9 flex items-center justify-center transition-colors"
-            style={{ color: 'var(--text-base)' }}
-          >
-            {menuOpen
-              ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-              : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
-            }
-          </button>
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          data-mobile-menu
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'}
+          className="md:hidden w-9 h-9 flex items-center justify-center transition-colors flex-shrink-0"
+          style={{ color: 'var(--text-base)' }}
+        >
+          {menuOpen
+            ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+            : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+          }
+        </button>
       </div>
 
       {/* Mobile menu */}

@@ -23,6 +23,13 @@ export default function HeroBanner({ movies = [], loading }) {
   const [activeIdx, setActiveIdx] = useState(0)
   const [detail, setDetail] = useState(null)
   const [animKey, setAnimKey] = useState(0)
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', check, { passive: true })
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const switchTo = useCallback((idx) => {
     setActiveIdx(idx)
@@ -72,13 +79,13 @@ export default function HeroBanner({ movies = [], loading }) {
   return (
     <div
       className="relative w-full overflow-hidden"
-      style={{ height: '860px', background: 'var(--bg-color)', marginBottom: '-120px' }}
+      style={{ height: isMobile ? '100svh' : '860px', background: 'var(--bg-color)', marginBottom: isMobile ? 0 : '-120px' }}
     >
-      {/* Cover image — right-side focused with mask fade on left */}
+      {/* Cover image */}
       <div
         key={`cover-${animKey}`}
         className="absolute inset-0 animate-cover-in"
-        style={{
+        style={isMobile ? {} : {
           maskImage: 'linear-gradient(90deg, transparent 5%, rgba(0,0,0,0.15) 20%, #000 45%, #000 85%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(90deg, transparent 5%, rgba(0,0,0,0.15) 20%, #000 45%, #000 85%, transparent 100%)',
         }}
@@ -97,17 +104,21 @@ export default function HeroBanner({ movies = [], loading }) {
         style={{ height: '220px', background: 'linear-gradient(0deg, var(--bg-color), rgba(25,27,36,0))' }}
       />
 
-      {/* Left dark overlay — ensures text readability */}
+      {/* Dark overlay for text readability */}
       <div
         className="absolute inset-0"
-        style={{ background: 'linear-gradient(90deg, rgba(25,27,36,0.95) 0%, rgba(25,27,36,0.7) 35%, transparent 65%)' }}
+        style={{
+          background: isMobile
+            ? 'linear-gradient(0deg, rgba(25,27,36,0.98) 0%, rgba(25,27,36,0.6) 50%, rgba(25,27,36,0.2) 100%)'
+            : 'linear-gradient(90deg, rgba(25,27,36,0.95) 0%, rgba(25,27,36,0.7) 35%, transparent 65%)',
+        }}
       />
 
-      {/* Slide content — left side */}
+      {/* Slide content */}
       <div
         key={`content-${animKey}`}
         className="absolute inset-0 flex flex-col justify-end z-20 animate-slide-in"
-        style={{ padding: '0 50px 150px', maxWidth: '650px' }}
+        style={{ padding: isMobile ? '0 20px 175px' : '0 50px 150px', maxWidth: isMobile ? '100%' : '650px' }}
       >
         {/* Badges */}
         <div className="flex items-center gap-2 flex-wrap mb-3">
@@ -185,8 +196,8 @@ export default function HeroBanner({ movies = [], loading }) {
         </div>
       </div>
 
-      {/* Thumbnail strip — bottom right */}
-      {pool.length > 1 && (
+      {/* Thumbnail strip — hidden on mobile, bottom right on desktop */}
+      {pool.length > 1 && !isMobile && (
         <div
           className="absolute z-30 flex items-center gap-2"
           style={{ bottom: '155px', right: '50px' }}
@@ -218,10 +229,15 @@ export default function HeroBanner({ movies = [], loading }) {
         </div>
       )}
 
-      {/* Category pills — bottom left above CTA overlap zone */}
+      {/* Category pills */}
       <nav
         className="absolute z-30 flex items-center gap-2 overflow-x-auto"
-        style={{ bottom: '110px', left: '50px', right: '200px', scrollbarWidth: 'none' }}
+        style={{
+          bottom: isMobile ? '80px' : '110px',
+          left: isMobile ? '20px' : '50px',
+          right: isMobile ? '20px' : '200px',
+          scrollbarWidth: 'none',
+        }}
         aria-label="Danh mục"
       >
         {FILTER_TABS.map((tab) => (
@@ -257,7 +273,10 @@ export default function HeroBanner({ movies = [], loading }) {
       {pool.length > 1 && (
         <div
           className="absolute z-30 flex items-center gap-1.5"
-          style={{ bottom: '135px', right: '50px' }}
+          style={{
+            bottom: isMobile ? '130px' : '135px',
+            right: isMobile ? '20px' : '50px',
+          }}
         >
           {pool.map((_, i) => (
             <button

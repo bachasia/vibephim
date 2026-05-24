@@ -1,66 +1,92 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useMovieDetail } from '../hooks/use-movie-detail.js'
 import { getImageUrl } from '../services/ophim-api.js'
 import EpisodeSection from '../components/movie/episode-section.jsx'
-
 import { useFavorites } from '../contexts/favorites-context.jsx'
 import { SkeletonBanner } from '../components/ui/skeleton.jsx'
 
-// Strip script/style tags from HTML to prevent XSS
 function sanitizeHtml(html = '') {
   return html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '')
 }
 
-function Chip({ to, label }) {
+// ── Tag chips ────────────────────────────────────────────────────────────────
+function TagImdb({ value }) {
+  if (!value) return null
+  return (
+    <span
+      className="inline-flex items-center font-mono text-[11px] font-bold px-2 py-0.5 rounded-sm"
+      style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)' }}
+    >
+      {value}
+    </span>
+  )
+}
+
+function TagClassic({ children }) {
+  return (
+    <span
+      className="inline-flex items-center font-mono text-[11px] px-2 py-0.5 rounded-sm"
+      style={{ background: 'var(--bg-3)', color: 'var(--text-base)', border: '1px solid rgba(255,255,255,0.1)' }}
+    >
+      {children}
+    </span>
+  )
+}
+
+function TagTopic({ to, children }) {
   return (
     <Link
       to={to}
-      className="inline-block text-sm transition-colors duration-200"
-      style={{
-        padding: '4px 12px',
-        borderRadius: '2px',
-        background: 'rgba(255,255,255,0.08)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        color: '#b3b3b3',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'rgba(255,216,117,0.1)'
-        e.currentTarget.style.borderColor = 'var(--primary)'
-        e.currentTarget.style.color = '#ffffff'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
-        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-        e.currentTarget.style.color = '#b3b3b3'
-      }}
+      className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-sm transition-colors duration-150"
+      style={{ background: 'rgba(255,216,117,0.08)', color: 'var(--primary)', border: '1px solid rgba(255,216,117,0.2)' }}
+      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,216,117,0.15)' }}
+      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,216,117,0.08)' }}
     >
-      {label}
+      {children}
     </Link>
   )
 }
 
-function MetaRow({ label, children }) {
+// ── Detail info line ─────────────────────────────────────────────────────────
+function InfoLine({ label, children }) {
   return (
-    <div className="flex gap-4 items-start text-sm">
-      <span
-        className="flex-shrink-0 font-mono text-[12px] pt-0.5"
-        style={{ width: '88px', color: '#737373' }}
-      >
+    <div className="flex gap-2 text-sm leading-relaxed">
+      <span className="shrink-0 font-mono text-[12px] pt-0.5" style={{ width: '80px', color: '#737373' }}>
         {label}
       </span>
-      <div className="flex-1 min-w-0">{children}</div>
+      <div className="flex-1 min-w-0" style={{ color: '#d4d4d4' }}>{children}</div>
     </div>
   )
 }
 
+// ── Status badge ─────────────────────────────────────────────────────────────
+function StatusBadge({ isCompleted, episodeCurrent, episodeTotal }) {
+  const text = isCompleted
+    ? `Hoàn Tất (${episodeTotal || episodeCurrent || '?'} tập)`
+    : `Đang chiếu (${episodeCurrent || '?'}${episodeTotal ? `/${episodeTotal}` : ''})`
+
+  return (
+    <div className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: '#46d369' }}>
+      <svg viewBox="0 0 512 512" width="13" height="13" fill="currentColor">
+        {isCompleted
+          ? <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>
+          : <path d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.5 33.3-6.5s4.5-25.9-6.5-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/>
+        }
+      </svg>
+      {text}
+    </div>
+  )
+}
+
+// ── Skeleton ─────────────────────────────────────────────────────────────────
 function DetailSkeleton() {
   return (
     <div className="min-h-screen animate-pulse" style={{ background: 'var(--bg-color)' }}>
       <SkeletonBanner />
-      <div className="px-8 py-8 flex gap-8">
-        <div className="shrink-0 rounded-sm" style={{ width: '180px', aspectRatio: '2/3', background: 'rgba(255,255,255,0.1)' }} />
-        <div className="flex-1 space-y-3 pt-28">
+      <div className="px-4 sm:px-8 py-8 flex gap-8">
+        <div className="shrink-0 rounded-sm hidden sm:block" style={{ width: '200px', aspectRatio: '2/3', background: 'rgba(255,255,255,0.1)' }} />
+        <div className="flex-1 space-y-3 pt-4">
           <div className="h-8 rounded w-2/3" style={{ background: 'rgba(255,255,255,0.1)' }} />
           <div className="h-4 rounded w-1/3" style={{ background: 'rgba(255,255,255,0.08)' }} />
           <div className="h-4 rounded w-1/2" style={{ background: 'rgba(255,255,255,0.08)' }} />
@@ -70,11 +96,69 @@ function DetailSkeleton() {
   )
 }
 
+// ── Action bar ───────────────────────────────────────────────────────────────
+function ActionBar({ onPlay, favorited, onToggleFavorite, trailerUrl }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <button
+        onClick={onPlay}
+        className="inline-flex items-center gap-2 font-bold text-sm transition-opacity hover:opacity-85 shrink-0"
+        style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)', padding: '10px 20px', borderRadius: '6px' }}
+      >
+        <svg width="13" height="13" viewBox="0 0 384 512" fill="currentColor">
+          <path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/>
+        </svg>
+        Xem Ngay
+      </button>
+
+      <button
+        onClick={onToggleFavorite}
+        className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-150"
+        style={{
+          padding: '9px 14px',
+          borderRadius: '6px',
+          background: favorited ? 'rgba(255,216,117,0.12)' : 'rgba(255,255,255,0.07)',
+          color: favorited ? 'var(--primary)' : '#b3b3b3',
+          border: favorited ? '1px solid rgba(255,216,117,0.3)' : '1px solid rgba(255,255,255,0.12)',
+        }}
+        onMouseEnter={e => {
+          if (!favorited) { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = '#fff' }
+        }}
+        onMouseLeave={e => {
+          if (!favorited) { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#b3b3b3' }
+        }}
+      >
+        <svg width="13" height="13" viewBox="0 0 512 512" fill={favorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="40">
+          <path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
+        </svg>
+        {favorited ? 'Đã yêu thích' : 'Yêu thích'}
+      </button>
+
+      {trailerUrl && (
+        <a
+          href={trailerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-white transition-colors duration-150"
+          style={{ padding: '9px 14px', borderRadius: '6px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)' }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          Trailer
+        </a>
+      )}
+    </div>
+  )
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
 export default function DetailPage() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const { movie, episodes, loading, error } = useMovieDetail(slug)
   const { isFavorite, addFavorite, removeFavorite } = useFavorites()
+  const [infoExpanded, setInfoExpanded] = useState(false)
 
   useEffect(() => {
     if (movie) document.title = `${movie.name} - VibePHim`
@@ -105,223 +189,212 @@ export default function DetailPage() {
 
   const isCompleted = status === 'completed' || (episode_current && episode_current === episode_total)
   const favorited = isFavorite(slug)
-
   const firstEp = episodes?.[0]?.server_data?.[0]
+
+  function handlePlay() {
+    if (firstEp) navigate(`/xem/${slug}/${firstEp.slug}`)
+    else navigate(`/phim/${slug}`)
+  }
+
+  function handleToggleFavorite() {
+    favorited ? removeFavorite(slug) : addFavorite(movie)
+  }
 
   return (
     <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>
-      {/* Backdrop */}
-      <div
-        className="relative overflow-hidden"
-        style={{ height: '56vh', minHeight: '320px' }}
-      >
-        <img
-          src={backdropUrl}
-          alt={name}
-          className="w-full h-full object-cover object-top"
-          style={{ opacity: 0.6 }}
-          onError={(e) => { e.target.style.display = 'none' }}
-        />
-        {/* Gradient: left to right */}
+
+      {/* ── Backdrop ── */}
+      <div className="relative overflow-hidden" style={{ height: '320px' }}>
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to right, var(--bg-color) 0%, transparent 50%)',
+            backgroundImage: `url(${backdropUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+            filter: 'blur(2px) brightness(0.55)',
+            transform: 'scale(1.05)',
           }}
         />
-        {/* Gradient: bottom to top */}
+        {/* Left-to-right gradient */}
         <div
           className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(to top, var(--bg-color) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)',
-          }}
+          style={{ background: 'linear-gradient(to right, var(--bg-color) 0%, rgba(25,27,36,0.6) 40%, transparent 100%)' }}
+        />
+        {/* Bottom fade */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(to top, var(--bg-color) 0%, rgba(25,27,36,0.3) 50%, transparent 100%)' }}
         />
       </div>
 
-      {/* Main content — overlaps backdrop */}
+      {/* ── Two-column layout ── */}
       <div
-        className="relative z-10 flex gap-7 px-8"
-        style={{ marginTop: '-120px', paddingBottom: '28px' }}
+        className="relative mx-auto"
+        style={{ maxWidth: '1200px', padding: '0 16px', marginTop: '-200px' }}
       >
-        {/* Poster */}
-        <div
-          className="flex-shrink-0 rounded-sm overflow-hidden hidden sm:block"
-          style={{ width: '180px', aspectRatio: '2/3', boxShadow: '0 8px 32px rgba(0,0,0,0.8)' }}
-        >
-          <img
-            src={getImageUrl(thumb_url)}
-            alt={name}
-            className="w-full h-full object-cover"
-            onError={(e) => { e.target.style.display = 'none' }}
-          />
-        </div>
+        <div className="flex flex-col md:flex-row gap-6 lg:gap-8">
 
-        {/* Info */}
-        <div className="flex-1 min-w-0" style={{ paddingTop: '120px' }}>
-          <h1
-            className="font-black text-white leading-tight mb-2"
-            style={{ fontSize: 'clamp(28px, 4vw, 40px)', letterSpacing: '-1px' }}
-          >
-            {name}
-          </h1>
-          {origin_name && (
-            <p className="text-sm mb-5 font-mono" style={{ color: '#b3b3b3' }}>{origin_name}</p>
-          )}
+          {/* ── LEFT SIDEBAR (dc-side) ── */}
+          <div className="shrink-0 w-full md:w-64 lg:w-72">
 
-          {/* Badges */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {quality && (
-              <span
-                className="font-mono text-[11px] font-bold px-3 py-1 rounded-sm"
-                style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)' }}
-              >
-                {quality}
-              </span>
-            )}
-            {lang && (
-              <span
-                className="font-mono text-[11px] font-bold px-3 py-1 rounded-sm"
-                style={{ background: 'var(--bg-3)', color: 'var(--text-base)', border: '1px solid rgba(255,255,255,0.15)' }}
-              >
-                {lang}
-              </span>
-            )}
-            {year && (
-              <span
-                className="font-mono text-[11px] font-bold px-3 py-1 rounded-sm"
-                style={{ background: 'var(--bg-3)', color: 'var(--text-base)', border: '1px solid rgba(255,255,255,0.15)' }}
-              >
-                {year}
-              </span>
-            )}
-            {time && (
-              <span
-                className="font-mono text-[11px] font-bold px-3 py-1 rounded-sm"
-                style={{ background: 'var(--bg-3)', color: 'var(--text-base)', border: '1px solid rgba(255,255,255,0.15)' }}
-              >
-                {time}
-              </span>
-            )}
-          </div>
-
-          {/* Status */}
-          {status && (
+            {/* Poster */}
             <div
-              className="flex items-center gap-2 text-sm font-semibold mb-4"
-              style={{ color: isCompleted ? '#46d369' : '#46d369' }}
+              className="mx-auto md:mx-0 rounded-sm overflow-hidden shadow-2xl"
+              style={{ width: '160px', aspectRatio: '2/3', boxShadow: '0 12px 40px rgba(0,0,0,0.8)' }}
             >
-              <span
-                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                style={{ background: '#46d369' }}
+              <img
+                src={getImageUrl(thumb_url)}
+                alt={name}
+                className="w-full h-full object-cover"
+                onError={e => { e.target.style.display = 'none' }}
               />
-              {isCompleted
-                ? `Hoàn tất${episode_total ? ` · ${episode_total} tập` : ''}`
-                : `Đang chiếu · Tập ${episode_current || '?'}${episode_total ? ` / ${episode_total}` : ''}`
-              }
             </div>
-          )}
 
-          {/* Meta rows */}
-          <div className="flex flex-col gap-3 mb-5">
-            {category.length > 0 && (
-              <MetaRow label="Thể loại">
-                <div className="flex flex-wrap gap-1.5">
-                  {category.map((c) => <Chip key={c.slug} to={`/the-loai/${c.slug}`} label={c.name} />)}
-                </div>
-              </MetaRow>
-            )}
-            {country.length > 0 && (
-              <MetaRow label="Quốc gia">
-                <div className="flex flex-wrap gap-1.5">
-                  {country.map((c) => <Chip key={c.slug} to={`/quoc-gia/${c.slug}`} label={c.name} />)}
-                </div>
-              </MetaRow>
-            )}
-            {director?.length > 0 && director[0] !== 'Đang cập nhật' && (
-              <MetaRow label="Đạo diễn">
-                <span className="text-sm text-white">{director.join(', ')}</span>
-              </MetaRow>
-            )}
-            {actor?.length > 0 && actor[0] !== 'Đang cập nhật' && (
-              <MetaRow label="Diễn viên">
-                <span className="text-sm line-clamp-2" style={{ color: '#b3b3b3' }}>{actor.join(', ')}</span>
-              </MetaRow>
-            )}
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex flex-wrap gap-3 mt-5">
-            <button
-              onClick={() => firstEp
-                ? navigate(`/xem/${slug}/${firstEp.slug}`)
-                : navigate(`/phim/${slug}`)
-              }
-              className="inline-flex items-center gap-2 font-bold text-sm text-white transition-opacity hover:opacity-85"
-              style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)', padding: '10px 20px', borderRadius: '4px' }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="5,3 19,12 5,21" />
-              </svg>
-              Xem Ngay
-            </button>
-
-            <button
-              onClick={() => favorited ? removeFavorite(slug) : addFavorite(movie)}
-              className="inline-flex items-center gap-2 font-semibold text-sm transition-colors duration-200"
-              style={{
-                padding: '10px 16px',
-                borderRadius: '4px',
-                background: favorited ? 'rgba(255,216,117,0.15)' : 'rgba(109,109,110,0.5)',
-                color: favorited ? 'var(--primary)' : '#ffffff',
-                border: favorited ? '1px solid var(--primary)' : 'none',
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill={favorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-              {favorited ? 'Đã yêu thích' : 'Yêu Thích'}
-            </button>
-
-            {trailer_url && (
-              <a
-                href={trailer_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 font-semibold text-sm text-white transition-colors duration-200"
-                style={{ padding: '10px 16px', borderRadius: '4px', background: 'rgba(109,109,110,0.5)' }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(109,109,110,0.35)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(109,109,110,0.5)' }}
+            {/* Title block */}
+            <div className="mt-4 text-center md:text-left">
+              <h1
+                className="font-black text-white leading-tight"
+                style={{ fontSize: 'clamp(20px, 3vw, 26px)', letterSpacing: '-0.5px' }}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="5,3 19,12 5,21" />
-                </svg>
-                Trailer
-              </a>
+                {name}
+              </h1>
+              {origin_name && (
+                <p className="text-xs mt-1 font-mono" style={{ color: '#737373' }}>{origin_name}</p>
+              )}
+            </div>
+
+            {/* Mobile: action bar right after title */}
+            <div className="mt-4 md:hidden">
+              <ActionBar
+                onPlay={handlePlay}
+                favorited={favorited}
+                onToggleFavorite={handleToggleFavorite}
+                trailerUrl={trailer_url}
+              />
+            </div>
+
+            {/* Info toggle button (mobile: collapsible; desktop: always visible) */}
+            <button
+              className="mt-4 w-full flex items-center justify-center gap-2 text-sm font-medium md:hidden transition-colors"
+              style={{
+                padding: '9px 16px',
+                borderRadius: '6px',
+                background: 'rgba(255,255,255,0.07)',
+                color: '#b3b3b3',
+                border: '1px solid rgba(255,255,255,0.12)',
+              }}
+              onClick={() => setInfoExpanded(v => !v)}
+            >
+              Thông tin phim
+              <svg
+                width="12" height="12" viewBox="0 0 448 512" fill="currentColor"
+                style={{ transform: infoExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+              >
+                <path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/>
+              </svg>
+            </button>
+
+            {/* Info section (always visible on md+, toggleable on mobile) */}
+            <div className={`mt-4 space-y-3 ${infoExpanded ? 'block' : 'hidden'} md:block`}>
+              {/* Tag row 1: quality, year, episodes */}
+              <div className="flex flex-wrap gap-1.5">
+                {quality && <TagImdb value={quality} />}
+                {lang && <TagClassic>{lang}</TagClassic>}
+                {year && <TagClassic>{year}</TagClassic>}
+                {(episode_current || episode_total) && (
+                  <TagClassic>
+                    {isCompleted
+                      ? `Tập Hoàn Tất (${episode_total || episode_current}/${episode_total || episode_current})`
+                      : `Tập ${episode_current || '?'}${episode_total ? `/${episode_total}` : ''}`}
+                  </TagClassic>
+                )}
+                {time && <TagClassic>{time}</TagClassic>}
+              </div>
+
+              {/* Tag row 2: genres */}
+              {category.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {category.map(c => (
+                    <TagTopic key={c.slug} to={`/the-loai/${c.slug}`}>{c.name}</TagTopic>
+                  ))}
+                </div>
+              )}
+
+              {/* Status */}
+              {status && (
+                <StatusBadge
+                  isCompleted={isCompleted}
+                  episodeCurrent={episode_current}
+                  episodeTotal={episode_total}
+                />
+              )}
+
+              {/* Description */}
+              {synopsis && (
+                <div className="text-sm leading-relaxed" style={{ color: '#a3a3a3' }}>
+                  <p className="line-clamp-5">{synopsis}</p>
+                </div>
+              )}
+
+              {/* Detail lines */}
+              <div className="space-y-2 pt-1">
+                {country.length > 0 && (
+                  <InfoLine label="Quốc gia">
+                    <div className="flex flex-wrap gap-1">
+                      {country.map(c => (
+                        <Link key={c.slug} to={`/quoc-gia/${c.slug}`} className="hover:text-white transition-colors">{c.name}</Link>
+                      ))}
+                    </div>
+                  </InfoLine>
+                )}
+                {director?.length > 0 && director[0] !== 'Đang cập nhật' && (
+                  <InfoLine label="Đạo diễn">
+                    <span>{director.join(', ')}</span>
+                  </InfoLine>
+                )}
+                {actor?.length > 0 && actor[0] !== 'Đang cập nhật' && (
+                  <InfoLine label="Diễn viên">
+                    <span className="line-clamp-3">{actor.join(', ')}</span>
+                  </InfoLine>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* ── RIGHT MAIN (dc-main) ── */}
+          <div className="flex-1 min-w-0 pt-0 md:pt-44">
+
+            {/* Desktop: action bar */}
+            <div className="hidden md:block mb-6">
+              <ActionBar
+                onPlay={handlePlay}
+                favorited={favorited}
+                onToggleFavorite={handleToggleFavorite}
+                trailerUrl={trailer_url}
+              />
+            </div>
+
+            {/* Divider */}
+            <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: '20px' }} />
+
+            {/* Synopsis (desktop — shown inline in main column) */}
+            {synopsis && (
+              <div className="hidden md:block mb-6" style={{ maxWidth: '700px' }}>
+                <h2 className="text-sm font-semibold mb-2 uppercase tracking-wide" style={{ color: '#737373' }}>
+                  Nội dung
+                </h2>
+                <p className="text-sm leading-relaxed line-clamp-4" style={{ color: '#a3a3a3' }}>{synopsis}</p>
+              </div>
             )}
+
+            {/* Episodes */}
+            <EpisodeSection episodes={episodes} movieSlug={slug} />
           </div>
         </div>
       </div>
 
-      {/* Synopsis */}
-      {synopsis && (
-        <div className="px-8 pb-7" style={{ maxWidth: '760px' }}>
-          <h2
-            className="text-xl font-bold mb-4 pb-4"
-            style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}
-          >
-            Nội Dung
-          </h2>
-          <p className="text-base leading-relaxed" style={{ color: '#b3b3b3' }}>
-            {synopsis}
-          </p>
-        </div>
-      )}
-
-      {/* Episodes */}
-      <div className="px-8 pb-8">
-        <EpisodeSection episodes={episodes} movieSlug={slug} />
-      </div>
-
+      {/* Bottom padding */}
+      <div style={{ height: '60px' }} />
     </div>
   )
 }

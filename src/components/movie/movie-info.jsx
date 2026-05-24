@@ -37,7 +37,7 @@ export default function MovieInfo({ movie }) {
   const favorited = isFavorite(movie.slug)
 
   const {
-    name, origin_name, thumb_url, year, quality, lang, time,
+    name, origin_name, poster_url, thumb_url, year, quality, lang, time,
     episode_current, episode_total, status,
     category = [], country = [],
     director = [], actor = [],
@@ -55,7 +55,7 @@ export default function MovieInfo({ movie }) {
       {/* Poster */}
       <div className="shrink-0 mx-auto md:mx-0">
         <img
-          src={getImageUrl(thumb_url)}
+          src={getImageUrl(poster_url || thumb_url)}
           alt={name}
           className="w-44 md:w-52 aspect-[2/3] object-cover rounded-sm shadow-2xl"
           onError={(e) => { e.target.style.display = 'none' }}
