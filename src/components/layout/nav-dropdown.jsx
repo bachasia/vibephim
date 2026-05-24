@@ -52,7 +52,7 @@ export default function NavDropdown({ label, items, columns = 3 }) {
 
       {open && (
         <div
-          className="absolute top-full left-0 pt-2 z-50"
+          className="absolute top-full right-0 pt-2 z-50"
           style={{ minWidth: '320px' }}
           onMouseEnter={openMenu}
           onMouseLeave={closeMenu}

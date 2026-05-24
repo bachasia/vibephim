@@ -1,17 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getImageUrl, getMovieDetail } from '../../services/ophim-api.js'
-import { MOVIE_TYPES } from '../../utils/constants.js'
 import { SkeletonBanner } from '../ui/skeleton.jsx'
-
-const FILTER_TABS = [
-  { label: 'Đề xuất', to: '/' },
-  { label: 'Phim bộ', to: `/browse?type=${MOVIE_TYPES.SERIES}` },
-  { label: 'Phim lẻ', to: `/browse?type=${MOVIE_TYPES.MOVIE}` },
-  { label: 'Hoạt hình', to: `/browse?type=${MOVIE_TYPES.ANIME}` },
-  { label: 'Hàn Quốc', to: '/quoc-gia/han-quoc' },
-  { label: 'Âu Mỹ', to: '/quoc-gia/au-my' },
-]
 
 const AUTO_ROTATE_MS = 7000
 const POOL_SIZE = 8
@@ -79,7 +69,7 @@ export default function HeroBanner({ movies = [], loading }) {
   return (
     <div
       className="relative w-full overflow-hidden"
-      style={{ height: isMobile ? '100svh' : '860px', background: 'var(--bg-color)', marginBottom: isMobile ? 0 : '-120px' }}
+      style={{ height: isMobile ? '100svh' : '860px', background: 'var(--bg-color)' }}
     >
       {/* Cover image */}
       <div
@@ -228,46 +218,6 @@ export default function HeroBanner({ movies = [], loading }) {
           ))}
         </div>
       )}
-
-      {/* Category pills */}
-      <nav
-        className="absolute z-30 flex items-center gap-2 overflow-x-auto"
-        style={{
-          bottom: isMobile ? '80px' : '110px',
-          left: isMobile ? '20px' : '50px',
-          right: isMobile ? '20px' : '200px',
-          scrollbarWidth: 'none',
-        }}
-        aria-label="Danh mục"
-      >
-        {FILTER_TABS.map((tab) => (
-          <Link
-            key={tab.to}
-            to={tab.to}
-            className="flex-shrink-0 font-medium transition-all duration-200"
-            style={{
-              padding: '6px 16px',
-              borderRadius: '999px',
-              fontSize: '13px',
-              background: 'rgba(255,255,255,0.1)',
-              color: '#e0e0e0',
-              border: '1px solid rgba(255,255,255,0.12)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--primary)'
-              e.currentTarget.style.color = 'var(--primary-btn-text)'
-              e.currentTarget.style.borderColor = 'var(--primary)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.1)'
-              e.currentTarget.style.color = '#e0e0e0'
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'
-            }}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </nav>
 
       {/* Progress dots */}
       {pool.length > 1 && (

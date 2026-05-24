@@ -89,7 +89,7 @@ export default function Header() {
         </Link>
 
         {/* Search bar — always visible */}
-        <InlineSearch className="flex-1 md:flex-none md:w-64 lg:w-80 xl:w-96" />
+        <InlineSearch className="hidden md:block md:flex-none md:w-64 lg:w-80 xl:w-96" />
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-0.5 ml-auto flex-shrink-0">
@@ -141,7 +141,7 @@ export default function Header() {
           data-mobile-menu
           onClick={() => setMenuOpen((v) => !v)}
           aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'}
-          className="md:hidden w-9 h-9 flex items-center justify-center transition-colors flex-shrink-0"
+          className="md:hidden ml-auto w-9 h-9 flex items-center justify-center transition-colors flex-shrink-0"
           style={{ color: 'var(--text-base)' }}
         >
           {menuOpen

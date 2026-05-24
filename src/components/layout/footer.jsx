@@ -45,8 +45,8 @@ const COLS = [
 
 export default function Footer() {
   return (
-    <footer style={{ background: 'var(--footer-bg)', borderTop: '1px solid var(--border-color)', marginTop: '4rem' }}>
-      <div className="max-w-screen-xl mx-auto px-6 md:px-12 py-12">
+    <footer style={{ background: 'var(--footer-bg)', borderTop: '1px solid var(--border-color)' }}>
+      <div className="max-w-screen-xl mx-auto px-6 md:px-12 pt-12 pb-24 md:pb-12">
         {/* Top grid */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
           {/* Brand */}

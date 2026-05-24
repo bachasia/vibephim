@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getNewestMovies, getMoviesByType, getMoviesByCountry } from '../services/ophim-api.js'
 import { MOVIE_TYPES } from '../utils/constants.js'
 import HeroBanner from '../components/movie/hero-banner.jsx'
+import CategoryTopics from '../components/movie/category-topics.jsx'
 import MovieCarousel from '../components/movie/movie-carousel.jsx'
 import Top10Carousel from '../components/movie/top10-carousel.jsx'
 
@@ -50,6 +51,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>
       <HeroBanner movies={data.newest || []} loading={loading} />
+      <CategoryTopics />
 
       {/* Country sections */}
       <MovieCarousel

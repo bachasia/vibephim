@@ -63,8 +63,8 @@ function InfoLine({ label, children }) {
 // ── Status badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ isCompleted, episodeCurrent, episodeTotal }) {
   const text = isCompleted
-    ? `Hoàn Tất (${episodeTotal || episodeCurrent || '?'} tập)`
-    : `Đang chiếu (${episodeCurrent || '?'}${episodeTotal ? `/${episodeTotal}` : ''})`
+    ? `Hoàn Tất (${episodeTotal || episodeCurrent || '?'})`
+    : `Đang chiếu (${episodeCurrent || '?'})`
 
   return (
     <div className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: '#46d369' }}>
@@ -304,8 +304,10 @@ export default function DetailPage() {
                 {(episode_current || episode_total) && (
                   <TagClassic>
                     {isCompleted
-                      ? `Tập Hoàn Tất (${episode_total || episode_current}/${episode_total || episode_current})`
-                      : `Tập ${episode_current || '?'}${episode_total ? `/${episode_total}` : ''}`}
+                      ? `Hoàn Tất (${episode_total || episode_current})`
+                      : episode_total && !String(episode_current || '').includes('/')
+                        ? `${episode_current}/${episode_total}`
+                        : (episode_current || episode_total)}
                   </TagClassic>
                 )}
                 {time && <TagClassic>{time}</TagClassic>}

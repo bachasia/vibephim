@@ -4,7 +4,7 @@ import { getImageUrl } from '../../services/ophim-api.js'
 export default function MovieCard({ movie }) {
   if (!movie) return null
 
-  const { name, slug, thumb_url, year, quality, lang, episode_current, origin_name } = movie
+  const { name, slug, thumb_url, poster_url, year, quality, lang, episode_current, origin_name } = movie
 
   return (
     <Link
@@ -25,7 +25,7 @@ export default function MovieCard({ movie }) {
         }}
       >
         <img
-          src={getImageUrl(thumb_url)}
+          src={getImageUrl(poster_url || thumb_url)}
           alt={name}
           loading="lazy"
           className="absolute inset-0 w-full h-full object-cover"
