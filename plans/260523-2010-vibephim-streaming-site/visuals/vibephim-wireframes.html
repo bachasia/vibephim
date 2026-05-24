@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibePHim — Interactive Wireframes</title>
+<style>
+/* ─── Design System Tokens (Netflix VN spec) ─── */
+:root {
+  /* Font */
+  --font-body: 'Netflix Sans', 'Helvetica Neue', 'Segoe UI', Roboto, Ubuntu, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', Consolas, monospace;
+
+  /* Surfaces */
+  --bg:               #000000;
+  --surface:          #141414;
+  --surface-muted:    #232323;
+  --surface-raised:   #2d2d2d;
+  --surface-strong:   #e50914;
+
+  /* Text */
+  --text:             #ffffff;
+  --text-dim:         #b3b3b3;
+  --text-muted:       #737373;
+
+  /* Accent (CTA) */
+  --accent:           #e50914;
+  --accent-hover:     #f40612;
+  --accent-dim:       rgba(229,9,20,0.15);
+
+  /* Borders */
+  --border:           rgba(255,255,255,0.1);
+  --border-bright:    rgba(255,255,255,0.2);
+
+  /* Radius */
+  --r-xs: 2px;
+  --r-sm: 4px;
+  --r-md: 8px;
+
+  /* Spacing */
+  --sp-1: 4px;
+  --sp-2: 6px;
+  --sp-3: 8px;
+  --sp-4: 12px;
+  --sp-5: 16px;
+  --sp-6: 22px;
+  --sp-7: 24px;
+  --sp-8: 32px;
+
+  /* Motion */
+  --dur-instant: 200ms;
+  --dur-fast:    400ms;
+
+  /* Status */
+  --green:     #46d369;
+  --green-dim: rgba(70,211,105,0.12);
+  --red:       #e50914;
+  --red-dim:   rgba(229,9,20,0.12);
+}
+
+[data-theme="light"] {
+  --bg:            #f3f3f3;
+  --surface:       #ffffff;
+  --surface-muted: #e5e5e5;
+  --surface-raised:#d4d4d4;
+  --text:          #141414;
+  --text-dim:      #444444;
+  --text-muted:    #888888;
+  --border:        rgba(0,0,0,0.1);
+  --border-bright: rgba(0,0,0,0.2);
+  --accent:        #e50914;
+  --accent-hover:  #c0070f;
+  --accent-dim:    rgba(229,9,20,0.1);
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+* > * { min-width: 0; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: normal;
+  overflow-wrap: break-word;
+  min-height: 100vh;
+}
+img { display: block; max-width: 100%; }
+button { cursor: pointer; font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+
+/* ─── Theme Toggle ─── */
+.theme-toggle {
+  position: fixed;
+  top: var(--sp-5);
+  right: var(--sp-5);
+  z-index: 9999;
+  width: 36px; height: 36px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-bright);
+  background: var(--surface-muted);
+  color: var(--text-dim);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: background var(--dur-instant), color var(--dur-instant);
+}
+.theme-toggle:hover { background: var(--surface-raised); color: var(--text); }
+
+/* ─── Page Navigator ─── */
+.page-nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.page-nav::-webkit-scrollbar { display: none; }
+[data-theme="light"] .page-nav { background: rgba(243,243,243,0.96); }
+.page-nav-btn {
+  flex-shrink: 0;
+  padding: 12px var(--sp-5);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--dur-instant), border-color var(--dur-instant);
+  white-space: nowrap;
+}
+.page-nav-btn:hover { color: var(--text-dim); }
+.page-nav-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+
+/* ─── Sections ─── */
+.page-section { display: none; }
+.page-section.active { display: block; }
+
+/* ─── Site Header ─── */
+.site-header {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%);
+  padding: 0 var(--sp-8);
+  height: 68px;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+}
+.site-header.sticky {
+  position: sticky;
+  top: 44px;
+  background: rgba(0,0,0,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+[data-theme="light"] .site-header.sticky { background: rgba(243,243,243,0.96); }
+.site-logo {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: -1px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+.site-nav {
+  display: flex;
+  gap: var(--sp-1);
+  flex: 1;
+}
+.site-nav-link {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-xs);
+  color: var(--text-dim);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color var(--dur-instant);
+  white-space: nowrap;
+}
+.site-nav-link:hover { color: var(--text); }
+.site-nav-link.active { color: var(--text); font-weight: 700; }
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-shrink: 0;
+}
+.icon-btn {
+  width: 32px; height: 32px;
+  border-radius: var(--r-xs);
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  transition: color var(--dur-instant);
+}
+.icon-btn:hover { color: var(--text); }
+
+/* ─── Hero Banner ─── */
+.hero-banner {
+  position: relative;
+  height: 80vh;
+  min-height: 500px;
+  overflow: hidden;
+}
+.hero-backdrop { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-backdrop-placeholder { position: absolute; inset: 0; }
+.hero-gradient {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 45%, rgba(0,0,0,0.05) 100%),
+    linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 30%);
+}
+.hero-content {
+  position: relative; z-index: 10;
+  height: 100%;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 0 var(--sp-8);
+  max-width: 580px;
+  gap: var(--sp-5);
+  padding-top: 68px;
+}
+.hero-badges { display: flex; gap: var(--sp-3); align-items: center; }
+.hero-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 3px var(--sp-3);
+  border-radius: var(--r-xs);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.hero-badge.quality { background: var(--accent); color: #fff; }
+.hero-badge.lang { background: rgba(255,255,255,0.12); color: var(--text); border: 1px solid rgba(255,255,255,0.2); }
+.hero-badge.rating { color: var(--green); font-family: var(--font-mono); font-size: 12px; background: none; padding: 0; }
+.hero-title {
+  font-size: 56px; /* xl */
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--text);
+  letter-spacing: -1.5px;
+}
+.hero-meta { font-size: 16px; color: var(--text-dim); display: flex; gap: var(--sp-4); align-items: center; }
+.hero-meta-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
+.hero-desc {
+  font-size: 16px;
+  color: var(--text-dim);
+  max-width: 420px;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hero-actions { display: flex; gap: var(--sp-4); }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: var(--sp-3);
+  padding: 12px var(--sp-7);
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  font-size: 16px;
+  transition: background var(--dur-instant), transform 100ms;
+}
+.btn-primary:hover { background: var(--accent-hover); transform: scale(0.98); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: var(--sp-3);
+  padding: 12px var(--sp-7);
+  background: rgba(109,109,110,0.7);
+  color: var(--text);
+  border: none;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  font-size: 16px;
+  backdrop-filter: blur(4px);
+  transition: background var(--dur-instant);
+}
+.btn-ghost:hover { background: rgba(109,109,110,0.5); }
+
+/* Gradient fade at bottom of hero section */
+.hero-vignette {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 120px;
+  background: linear-gradient(to top, var(--bg), transparent);
+  z-index: 5;
+}
+
+/* ─── Movie Card ─── */
+.movie-card {
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  position: relative;
+  background: var(--surface-muted);
+  transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.movie-card:hover { transform: scale(1.05); box-shadow: 0 10px 40px rgba(0,0,0,0.7); z-index: 10; }
+.movie-card:hover .mc-overlay { opacity: 1; }
+.movie-card:hover .mc-info { background: var(--surface-raised); }
+.movie-poster-ph {
+  width: 100%; aspect-ratio: 2/3;
+  display: flex; align-items: flex-end; padding: var(--sp-3);
+}
+.mc-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 55%, transparent 100%);
+  opacity: 0;
+  transition: opacity var(--dur-instant);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: var(--sp-4) var(--sp-3);
+  gap: var(--sp-2);
+}
+.mc-overlay-title { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.3; }
+.mc-overlay-meta { font-size: 11px; color: rgba(255,255,255,0.6); font-family: var(--font-mono); }
+
+/* Badges */
+.badge {
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--r-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+}
+.badge-q {
+  position: absolute; top: 6px; right: 6px;
+  background: var(--accent); color: #fff;
+}
+.badge-ep {
+  position: absolute; bottom: 44px; left: 6px;
+  background: rgba(0,0,0,0.8); color: rgba(255,255,255,0.85);
+}
+.mc-info {
+  padding: var(--sp-3) var(--sp-3) var(--sp-4);
+  background: var(--surface-muted);
+  transition: background var(--dur-instant);
+}
+.mc-title {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mc-year { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-family: var(--font-mono); }
+
+/* ─── Carousels ─── */
+.carousel-section { padding: var(--sp-5) 0; }
+.carousel-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 0 var(--sp-8); margin-bottom: var(--sp-4);
+}
+.carousel-title { font-size: 20px; font-weight: 700; }
+.carousel-more { font-size: 13px; color: var(--accent); font-family: var(--font-mono); font-weight: 700; }
+.carousel-more:hover { text-decoration: underline; }
+.carousel-wrap { position: relative; }
+.carousel-track {
+  display: flex; gap: var(--sp-3);
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: var(--sp-3) var(--sp-8) var(--sp-5);
+  scrollbar-width: none;
+}
+.carousel-track::-webkit-scrollbar { display: none; }
+.carousel-track .movie-card { width: 150px; scroll-snap-align: start; }
+.carousel-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 40px; height: 64px;
+  border: none; background: rgba(0,0,0,0.75); color: #fff;
+  font-size: 22px;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 5; opacity: 0;
+  transition: opacity var(--dur-instant), background var(--dur-instant);
+}
+.carousel-wrap:hover .carousel-arrow { opacity: 1; }
+.carousel-arrow.left { left: 0; border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+.carousel-arrow.right { right: 0; border-radius: var(--r-sm) 0 0 var(--r-sm); }
+.carousel-arrow:hover { background: rgba(0,0,0,0.9); }
+
+/* ─── Movie Grid ─── */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--sp-3);
+  padding: 0 var(--sp-8);
+}
+.movie-grid .movie-card { width: auto; }
+@media (max-width: 1200px) { .movie-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 900px)  { .movie-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px)  { .movie-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ─── Pagination ─── */
+.pagination {
+  display: flex; align-items: center; justify-content: center;
+  gap: var(--sp-2); padding: var(--sp-7);
+}
+.page-btn {
+  min-width: 36px; height: 36px; padding: 0 var(--sp-3);
+  border-radius: var(--r-xs);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-mono); font-size: 13px;
+  transition: all var(--dur-instant);
+}
+.page-btn:hover { background: var(--surface-raised); color: var(--text); }
+.page-btn.current { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; }
+.page-btn.dots { border: none; pointer-events: none; color: var(--text-muted); }
+
+/* ─── Filter Bar ─── */
+.filter-bar {
+  display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap;
+  padding: var(--sp-4) var(--sp-8);
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 44px; z-index: 90;
+}
+.filter-select {
+  padding: 8px 32px 8px var(--sp-4);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--r-xs);
+  color: var(--text);
+  font-family: var(--font-body); font-size: 14px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23b3b3b3' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  cursor: pointer;
+  transition: border-color var(--dur-instant);
+}
+.filter-select:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+.filter-reset {
+  padding: 8px var(--sp-5);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--r-xs);
+  background: transparent;
+  color: var(--text-dim); font-size: 14px;
+  transition: all var(--dur-instant);
+}
+.filter-reset:hover { color: var(--text); background: var(--surface-raised); }
+.filter-info { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+
+/* ─── Section Title Bar ─── */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-7) var(--sp-8) 0;
+  margin-bottom: var(--sp-5);
+}
+.section-title { font-size: 24px; font-weight: 700; }
+.section-subtitle { font-size: 14px; color: var(--text-dim); font-family: var(--font-mono); margin-top: var(--sp-1); }
+
+/* ─── Detail Page ─── */
+.detail-backdrop {
+  position: relative; height: 56vh; min-height: 320px; overflow: hidden;
+}
+.detail-bd-placeholder { width: 100%; height: 100%; }
+.detail-bd-grad {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to right, var(--bg) 0%, transparent 50%),
+    linear-gradient(to top, var(--bg) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+}
+.detail-main {
+  padding: 0 var(--sp-8) var(--sp-7);
+  display: flex; gap: var(--sp-7);
+  margin-top: -120px;
+  position: relative; z-index: 10;
+}
+.detail-poster {
+  width: 180px; flex-shrink: 0;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+}
+.detail-poster-ph {
+  width: 180px; aspect-ratio: 2/3;
+}
+.detail-info { flex: 1; padding-top: 120px; }
+.detail-title { font-size: 40px; font-weight: 900; line-height: 1.1; margin-bottom: var(--sp-2); letter-spacing: -1px; }
+.detail-origin { font-size: 14px; color: var(--text-dim); margin-bottom: var(--sp-5); font-family: var(--font-mono); }
+.detail-badges { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-4); }
+.detail-badge {
+  font-family: var(--font-mono); font-size: 11px;
+  padding: 4px var(--sp-4); border-radius: var(--r-xs); font-weight: 700;
+}
+.detail-badge.q { background: var(--accent); color: #fff; }
+.detail-badge.other { background: var(--surface-raised); color: var(--text-dim); border: 1px solid var(--border-bright); }
+.detail-status { font-size: 14px; color: var(--green); display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-4); font-weight: 600; }
+.detail-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.detail-meta { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-5); }
+.detail-meta-row { display: flex; gap: var(--sp-4); align-items: flex-start; font-size: 14px; }
+.detail-meta-label { color: var(--text-muted); width: 88px; flex-shrink: 0; font-family: var(--font-mono); font-size: 12px; padding-top: 1px; }
+.chips { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.chip {
+  padding: 4px var(--sp-4);
+  border-radius: 2px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--border);
+  font-size: 13px; color: var(--text-dim); cursor: pointer;
+  transition: all var(--dur-instant);
+}
+.chip:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--text); }
+.detail-actions { display: flex; gap: var(--sp-3); margin-top: var(--sp-5); }
+.btn-sm-primary {
+  display: inline-flex; align-items: center; gap: var(--sp-3);
+  padding: 10px 20px; background: var(--accent); color: #fff;
+  border: none; border-radius: var(--r-sm);
+  font-weight: 700; font-size: 14px;
+  transition: background var(--dur-instant);
+}
+.btn-sm-primary:hover { background: var(--accent-hover); }
+.btn-sm-ghost {
+  display: inline-flex; align-items: center; gap: var(--sp-3);
+  padding: 10px var(--sp-5); background: rgba(109,109,110,0.5);
+  color: var(--text); border: none; border-radius: var(--r-sm);
+  font-size: 14px; font-weight: 600;
+  transition: background var(--dur-instant);
+}
+.btn-sm-ghost:hover { background: rgba(109,109,110,0.35); }
+.detail-synopsis { padding: 0 var(--sp-8) var(--sp-7); max-width: 760px; }
+.synopsis-heading { font-size: 20px; font-weight: 700; margin-bottom: var(--sp-4); padding-bottom: var(--sp-4); border-bottom: 1px solid var(--border); }
+.synopsis-text { font-size: 16px; color: var(--text-dim); line-height: 1.7; }
+.synopsis-more { color: var(--accent); font-size: 13px; margin-top: var(--sp-3); cursor: pointer; font-family: var(--font-mono); }
+
+/* ─── Episode Section ─── */
+.episode-section { padding: 0 var(--sp-8) var(--sp-8); }
+.episode-heading { font-size: 20px; font-weight: 700; margin-bottom: var(--sp-5); }
+.ep-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: var(--sp-5); }
+.ep-tab {
+  padding: var(--sp-4) var(--sp-5);
+  border: none; background: transparent; color: var(--text-muted);
+  font-size: 14px; font-weight: 600;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all var(--dur-instant);
+}
+.ep-tab:hover { color: var(--text-dim); }
+.ep-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+.ep-grid { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+.ep-btn {
+  padding: 8px var(--sp-4);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  color: var(--text-dim);
+  font-family: var(--font-mono); font-size: 12px;
+  min-width: 64px; text-align: center;
+  transition: all var(--dur-instant);
+}
+.ep-btn:hover { background: var(--surface-muted); color: var(--text); border-color: var(--border-bright); }
+.ep-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+
+/* ─── Video Player ─── */
+.player-wrap {
+  position: relative; background: #000;
+  aspect-ratio: 16/9; overflow: hidden;
+}
+.player-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.player-spinner {
+  width: 48px; height: 48px;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.player-title-bar {
+  position: absolute; top: 0; left: 0; right: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+  padding: var(--sp-5);
+  font-size: 16px; font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  opacity: 0; transition: opacity var(--dur-instant);
+}
+.player-wrap:hover .player-title-bar { opacity: 1; }
+.player-controls {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+  padding: var(--sp-5);
+  opacity: 0; transition: opacity var(--dur-instant);
+}
+.player-wrap:hover .player-controls { opacity: 1; }
+.seekbar-wrap { margin-bottom: var(--sp-4); cursor: pointer; }
+.seekbar {
+  width: 100%; height: 4px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 2px; position: relative;
+}
+.seekbar-buf {
+  position: absolute; left: 0; top: 0; height: 100%;
+  width: 55%; background: rgba(255,255,255,0.4); border-radius: 2px;
+}
+.seekbar-played {
+  position: absolute; left: 0; top: 0; height: 100%;
+  width: 38%; background: var(--accent); border-radius: 2px;
+}
+.seekbar-thumb {
+  position: absolute; left: 38%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(229,9,20,0.3);
+}
+.player-row {
+  display: flex; align-items: center; gap: var(--sp-4);
+}
+.player-btn {
+  width: 32px; height: 32px; border: none; background: transparent;
+  color: #fff; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r-xs);
+  transition: background var(--dur-instant);
+}
+.player-btn:hover { background: rgba(255,255,255,0.12); }
+.player-time { font-family: var(--font-mono); font-size: 12px; color: rgba(255,255,255,0.8); white-space: nowrap; }
+.player-spacer { flex: 1; }
+.player-quality {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; font-family: var(--font-mono); font-size: 11px;
+  padding: 4px var(--sp-3); border-radius: var(--r-xs);
+}
+.player-compact {
+  display: flex; align-items: center; gap: var(--sp-5);
+  padding: var(--sp-4) var(--sp-8);
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--border);
+}
+.player-compact-title { font-weight: 700; font-size: 16px; }
+.player-compact-meta { font-size: 13px; color: var(--text-dim); font-family: var(--font-mono); }
+.player-compact-badges { display: flex; gap: var(--sp-2); margin-left: auto; }
+
+/* ─── Search ─── */
+.search-wrap { padding: var(--sp-8) var(--sp-8) var(--sp-5); max-width: 720px; margin: 0 auto; }
+.search-input-wrap { position: relative; }
+.search-ico {
+  position: absolute; left: var(--sp-5); top: 50%;
+  transform: translateY(-50%); color: var(--text-dim);
+  font-size: 18px; pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: 16px var(--sp-7) 16px 52px;
+  background: var(--surface-muted);
+  border: 2px solid var(--border-bright);
+  border-radius: var(--r-md);
+  color: var(--text); font-family: var(--font-body); font-size: 18px;
+  transition: border-color var(--dur-instant);
+}
+.search-input:focus { outline: none; border-color: var(--accent); }
+.search-clear {
+  position: absolute; right: var(--sp-4); top: 50%; transform: translateY(-50%);
+  border: none; background: transparent; color: var(--text-dim); font-size: 20px; padding: var(--sp-2);
+}
+.search-label {
+  padding: var(--sp-4) var(--sp-8);
+  font-family: var(--font-mono); font-size: 13px; color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+.empty-state { padding: 80px var(--sp-8); text-align: center; }
+.empty-icon { font-size: 52px; color: var(--border-bright); margin-bottom: var(--sp-5); }
+.empty-title { font-size: 20px; font-weight: 700; margin-bottom: var(--sp-3); }
+.empty-desc { font-size: 16px; color: var(--text-dim); line-height: 1.6; margin-bottom: var(--sp-7); }
+
+/* ─── Page Title Bar ─── */
+.page-title-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-7) var(--sp-8);
+  border-bottom: 1px solid var(--border);
+}
+.page-title { font-size: 24px; font-weight: 700; }
+.page-subtitle { font-size: 14px; color: var(--text-dim); margin-top: var(--sp-2); font-family: var(--font-mono); }
+.btn-danger {
+  padding: 8px var(--sp-5);
+  border: 1px solid rgba(229,9,20,0.5); border-radius: var(--r-xs);
+  background: transparent; color: var(--accent); font-size: 14px;
+  transition: all var(--dur-instant);
+}
+.btn-danger:hover { background: var(--red-dim); }
+
+/* Remove btn on fav card */
+.mc-remove {
+  position: absolute; top: 6px; right: 6px;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(0,0,0,0.75); border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.8); font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 5; transition: all var(--dur-instant);
+}
+.mc-remove:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ─── History ─── */
+.history-list { padding: var(--sp-5) var(--sp-8) var(--sp-8); display: flex; flex-direction: column; gap: var(--sp-3); }
+.history-item {
+  display: flex; gap: var(--sp-5);
+  padding: var(--sp-5);
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  transition: border-color var(--dur-instant);
+}
+.history-item:hover { border-color: var(--border-bright); }
+.history-thumb {
+  width: 128px; aspect-ratio: 16/9;
+  border-radius: var(--r-xs); overflow: hidden;
+  flex-shrink: 0; background: var(--surface-muted);
+  display: flex; align-items: center; justify-content: center;
+}
+.history-info { flex: 1; display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.history-title { font-size: 16px; font-weight: 700; }
+.history-episode { font-size: 14px; color: var(--text-dim); }
+.progress-wrap { background: var(--surface-raised); border-radius: 2px; height: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+.progress-fill.done { background: var(--green); }
+.history-meta { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); display: flex; gap: var(--sp-5); }
+.history-action { display: flex; align-items: flex-end; }
+.btn-continue {
+  padding: 8px var(--sp-5);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  color: var(--accent); border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 700; white-space: nowrap;
+  transition: all var(--dur-instant);
+}
+.btn-continue:hover { background: var(--accent); color: #fff; }
+.btn-continue.replay { border-color: var(--border-bright); color: var(--text-dim); background: transparent; }
+.btn-continue.replay:hover { background: var(--surface-raised); color: var(--text); border-color: var(--border-bright); }
+
+/* ─── Footer ─── */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: var(--sp-7) var(--sp-8);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px; color: var(--text-muted);
+  margin-top: var(--sp-8);
+}
+
+/* ─── Poster Palettes ─── */
+.p1 { background: linear-gradient(150deg,#0e0318,#2a0a4e); }
+.p2 { background: linear-gradient(150deg,#071020,#0d2a50); }
+.p3 { background: linear-gradient(150deg,#1a0404,#4a0c0c); }
+.p4 { background: linear-gradient(150deg,#051a05,#0f3a0f); }
+.p5 { background: linear-gradient(150deg,#1a1203,#3d2a07); }
+.p6 { background: linear-gradient(150deg,#120318,#320a3c); }
+.p7 { background: linear-gradient(150deg,#03121a,#0a2a3a); }
+.p8 { background: linear-gradient(150deg,#1a0d03,#3d200a); }
+
+/* ─── Fade-in ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-section.active > * { animation: fadeUp var(--dur-fast) ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">&#9790;</button>
+
+<!-- Page Navigator -->
+<nav class="page-nav">
+  <button class="page-nav-btn active" data-page="home">01 Home</button>
+  <button class="page-nav-btn" data-page="browse">02 Browse</button>
+  <button class="page-nav-btn" data-page="detail">03 Detail</button>
+  <button class="page-nav-btn" data-page="watch">04 Watch</button>
+  <button class="page-nav-btn" data-page="search">05 Search</button>
+  <button class="page-nav-btn" data-page="category">06 Category</button>
+  <button class="page-nav-btn" data-page="favorites">07 Favorites</button>
+  <button class="page-nav-btn" data-page="history">08 History</button>
+</nav>
+
+<!-- ══════════════════════════════════════ PAGE 1: HOME ══ -->
+<section class="page-section active" id="page-home">
+  <div style="position:relative">
+    <header class="site-header">
+      <div class="site-logo">VibePHim</div>
+      <nav class="site-nav">
+        <a class="site-nav-link active">Trang Chủ</a>
+        <a class="site-nav-link">Phim Bộ</a>
+        <a class="site-nav-link">Phim Lẻ</a>
+        <a class="site-nav-link">Hoạt Hình</a>
+        <a class="site-nav-link">TV Shows</a>
+      </nav>
+      <div class="site-header-actions">
+        <button class="icon-btn">&#128269;</button>
+        <button class="icon-btn">&#9825;</button>
+        <button class="icon-btn">&#128336;</button>
+      </div>
+    </header>
+
+    <div class="hero-banner">
+      <div class="hero-backdrop-placeholder p1"></div>
+      <div class="hero-gradient"></div>
+      <div class="hero-content">
+        <div class="hero-badges">
+          <span class="hero-badge quality">HD</span>
+          <span class="hero-badge lang">Vietsub</span>
+          <span class="hero-badge rating">★ 8.7</span>
+        </div>
+        <h1 class="hero-title">Squid Game<br>Season 2</h1>
+        <div class="hero-meta">
+          <span>2024</span><span class="hero-meta-dot"></span>
+          <span>Hàn Quốc</span><span class="hero-meta-dot"></span>
+          <span>Tập 7 / 7</span>
+        </div>
+        <p class="hero-desc">Gi-hun trở lại với cuộc chiến sinh tử, quyết tâm phá hủy trò chơi từ bên trong với những đồng minh mới và kẻ thù cũ.</p>
+        <div class="hero-actions">
+          <button class="btn-primary">&#9654; Xem Ngay</button>
+          <button class="btn-ghost">&#9432; Chi Tiết</button>
+        </div>
+      </div>
+      <div class="hero-vignette"></div>
+    </div>
+  </div>
+
+  <!-- Carousels -->
+  <div class="carousel-section">
+    <div class="carousel-header">
+      <div class="carousel-title">Phim Mới Cập Nhật</div>
+      <a class="carousel-more">Xem thêm →</a>
+    </div>
+    <div class="carousel-wrap">
+      <button class="carousel-arrow left">&#8249;</button>
+      <div class="carousel-track">
+        <div class="movie-card"><div class="movie-poster-ph p1"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 12</span><div class="mc-overlay"><div class="mc-overlay-title">Gyeongseong Creature</div><div class="mc-overlay-meta">2024 · HD · Vietsub</div></div><div class="mc-info"><div class="mc-title">Gyeongseong Creature</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p2"></div><span class="badge badge-q" style="background:var(--surface-raised);color:var(--text-dim)">CAM</span><span class="badge badge-ep">Tập 3</span><div class="mc-overlay"><div class="mc-overlay-title">Solo Leveling</div><div class="mc-overlay-meta">2024 · CAM</div></div><div class="mc-info"><div class="mc-title">Solo Leveling</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Full</span><div class="mc-overlay"><div class="mc-overlay-title">Oppenheimer</div><div class="mc-overlay-meta">2023 · HD · Vietsub</div></div><div class="mc-info"><div class="mc-title">Oppenheimer</div><div class="mc-year">2023</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p4"></div><span class="badge badge-q">HD</span><div class="mc-overlay"><div class="mc-overlay-title">The Bear Season 3</div><div class="mc-overlay-meta">2024 · HD</div></div><div class="mc-info"><div class="mc-title">The Bear Season 3</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p5"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 8</span><div class="mc-overlay"><div class="mc-overlay-title">The Last of Us S2</div><div class="mc-overlay-meta">2024 · HD · Vietsub</div></div><div class="mc-info"><div class="mc-title">The Last of Us S2</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p6"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Dune Part Two</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p7"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 24</span><div class="mc-info"><div class="mc-title">Shogun</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p8"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Poor Things</div><div class="mc-year">2023</div></div></div>
+      </div>
+      <button class="carousel-arrow right">&#8250;</button>
+    </div>
+  </div>
+
+  <div class="carousel-section">
+    <div class="carousel-header"><div class="carousel-title">Phim Bộ</div><a class="carousel-more">Xem thêm →</a></div>
+    <div class="carousel-wrap">
+      <button class="carousel-arrow left">&#8249;</button>
+      <div class="carousel-track">
+        <div class="movie-card"><div class="movie-poster-ph p2"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 16</span><div class="mc-info"><div class="mc-title">Sweet Home 3</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p5"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 12</span><div class="mc-info"><div class="mc-title">Vincenzo</div><div class="mc-year">2021</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p7"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Kingdom</div><div class="mc-year">2022</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 20</span><div class="mc-info"><div class="mc-title">Mr. Queen</div><div class="mc-year">2021</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p1"></div><span class="badge badge-q">FHD</span><span class="badge badge-ep">Tập 8</span><div class="mc-info"><div class="mc-title">Severance S2</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p6"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 6</span><div class="mc-info"><div class="mc-title">Andor S2</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p4"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 10</span><div class="mc-info"><div class="mc-title">House of Dragon S2</div><div class="mc-year">2024</div></div></div>
+      </div>
+      <button class="carousel-arrow right">&#8250;</button>
+    </div>
+  </div>
+
+  <div class="carousel-section">
+    <div class="carousel-header"><div class="carousel-title">Phim Lẻ</div><a class="carousel-more">Xem thêm →</a></div>
+    <div class="carousel-wrap">
+      <button class="carousel-arrow left">&#8249;</button>
+      <div class="carousel-track">
+        <div class="movie-card"><div class="movie-poster-ph p3"></div><span class="badge badge-q">FHD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Deadpool &amp; Wolverine</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p6"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Inside Out 2</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p4"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Alien: Romulus</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p8"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Twisters</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p2"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Longlegs</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p5"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">A Quiet Place: Day One</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p1"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Civil War</div><div class="mc-year">2024</div></div></div>
+      </div>
+      <button class="carousel-arrow right">&#8250;</button>
+    </div>
+  </div>
+
+  <div class="carousel-section">
+    <div class="carousel-header"><div class="carousel-title">Hoạt Hình</div><a class="carousel-more">Xem thêm →</a></div>
+    <div class="carousel-wrap">
+      <button class="carousel-arrow left">&#8249;</button>
+      <div class="carousel-track">
+        <div class="movie-card"><div class="movie-poster-ph p5"></div><span class="badge badge-q">FHD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Inside Out 2</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p7"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 24</span><div class="mc-info"><div class="mc-title">Solo Leveling</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p2"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 12</span><div class="mc-info"><div class="mc-title">Demon Slayer S4</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p4"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Kung Fu Panda 4</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p6"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 18</span><div class="mc-info"><div class="mc-title">Attack on Titan Final</div><div class="mc-year">2023</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p3"></div><span class="badge badge-q">FHD</span><div class="mc-info"><div class="mc-title">Wish</div><div class="mc-year">2023</div></div></div>
+      </div>
+      <button class="carousel-arrow right">&#8250;</button>
+    </div>
+  </div>
+
+  <footer class="site-footer">© 2024 VibePHim &nbsp;|&nbsp; Dữ liệu: OPhim API &nbsp;|&nbsp; Không lưu trữ nội dung bản quyền</footer>
+</section>
+
+<!-- ═════════════════════════════════════ PAGE 2: BROWSE ══ -->
+<section class="page-section" id="page-browse">
+  <header class="site-header sticky">
+    <div class="site-logo">VibePHim</div>
+    <nav class="site-nav">
+      <a class="site-nav-link">Trang Chủ</a>
+      <a class="site-nav-link active">Phim Bộ</a>
+      <a class="site-nav-link">Phim Lẻ</a>
+      <a class="site-nav-link">Hoạt Hình</a>
+      <a class="site-nav-link">TV Shows</a>
+    </nav>
+    <div class="site-header-actions">
+      <button class="icon-btn">&#128269;</button>
+      <button class="icon-btn">&#9825;</button>
+      <button class="icon-btn">&#128336;</button>
+    </div>
+  </header>
+
+  <div class="section-header">
+    <div>
+      <div class="section-title">Duyệt Phim</div>
+      <div class="section-subtitle">Khám phá kho phim phong phú</div>
+    </div>
+  </div>
+
+  <div class="filter-bar" style="top:112px">
+    <select class="filter-select"><option>Thể Loại</option><option>Hành Động</option><option>Tình Cảm</option><option>Hài Hước</option><option>Kinh Dị</option></select>
+    <select class="filter-select"><option>Quốc Gia</option><option>Hàn Quốc</option><option>Mỹ</option><option>Trung Quốc</option><option>Nhật Bản</option></select>
+    <select class="filter-select"><option>Năm</option><option>2024</option><option>2023</option><option>2022</option></select>
+    <select class="filter-select"><option>Loại Phim</option><option>Phim Bộ</option><option>Phim Lẻ</option><option>Hoạt Hình</option></select>
+    <button class="filter-reset">Đặt lại</button>
+    <div class="filter-info">20 / 480 phim · trang 1/24</div>
+  </div>
+
+  <div style="padding: 24px 0 0">
+    <div class="movie-grid">
+      <div class="movie-card"><div class="movie-poster-ph p1" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 12</span><div class="mc-overlay"><div class="mc-overlay-title">Gyeongseong Creature</div><div class="mc-overlay-meta">2024 · HD</div></div><div class="mc-info"><div class="mc-title">Gyeongseong Creature</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p2" style="aspect-ratio:2/3"></div><span class="badge badge-q">FHD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Oppenheimer</div><div class="mc-year">2023</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p3" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 8</span><div class="mc-info"><div class="mc-title">The Last of Us S2</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p4" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 24</span><div class="mc-info"><div class="mc-title">Shogun</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p5" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Dune Part Two</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p6" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 3</span><div class="mc-info"><div class="mc-title">Solo Leveling</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p7" style="aspect-ratio:2/3"></div><span class="badge badge-q">FHD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Deadpool &amp; Wolverine</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p8" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 16</span><div class="mc-info"><div class="mc-title">Sweet Home 3</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p2" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Poor Things</div><div class="mc-year">2023</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p4" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 10</span><div class="mc-info"><div class="mc-title">House of Dragon S2</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p6" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Alien: Romulus</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p3" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Twisters</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p1" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 12</span><div class="mc-info"><div class="mc-title">Demon Slayer S4</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p5" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Longlegs</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p7" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 6</span><div class="mc-info"><div class="mc-title">Andor S2</div><div class="mc-year">2024</div></div></div>
+    </div>
+    <div class="pagination">
+      <button class="page-btn">&#171;</button>
+      <button class="page-btn">&#8249;</button>
+      <button class="page-btn current">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn dots">···</button>
+      <button class="page-btn">24</button>
+      <button class="page-btn">&#8250;</button>
+      <button class="page-btn">&#187;</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ PAGE 3: DETAIL ══ -->
+<section class="page-section" id="page-detail">
+  <header class="site-header sticky">
+    <div class="site-logo">VibePHim</div>
+    <nav class="site-nav">
+      <a class="site-nav-link">&#8592; Trang Chủ</a>
+    </nav>
+    <div class="site-header-actions">
+      <button class="icon-btn">&#128269;</button>
+      <button class="icon-btn">&#9825;</button>
+    </div>
+  </header>
+
+  <div class="detail-backdrop">
+    <div class="detail-bd-placeholder p1" style="width:100%;height:100%;opacity:.6"></div>
+    <div class="detail-bd-grad"></div>
+  </div>
+
+  <div class="detail-main">
+    <div class="detail-poster">
+      <div class="movie-poster-ph p1" style="width:180px;aspect-ratio:2/3;border-radius:var(--r-sm)"></div>
+    </div>
+    <div class="detail-info">
+      <h1 class="detail-title">Squid Game: Season 2</h1>
+      <div class="detail-origin">오징어 게임 2 · Squid Game 2</div>
+      <div class="detail-badges">
+        <span class="detail-badge q">HD</span>
+        <span class="detail-badge other">Vietsub</span>
+        <span class="detail-badge other">2024</span>
+        <span class="detail-badge other">40 phút/tập</span>
+      </div>
+      <div class="detail-status">Đang chiếu · Tập 7 / 7</div>
+      <div class="detail-meta">
+        <div class="detail-meta-row">
+          <span class="detail-meta-label">Thể loại</span>
+          <div class="chips">
+            <span class="chip">Hành Động</span>
+            <span class="chip">Kinh Dị</span>
+            <span class="chip">Bí Ẩn</span>
+            <span class="chip">Tâm Lý</span>
+          </div>
+        </div>
+        <div class="detail-meta-row">
+          <span class="detail-meta-label">Quốc gia</span>
+          <div class="chips"><span class="chip">Hàn Quốc</span></div>
+        </div>
+        <div class="detail-meta-row">
+          <span class="detail-meta-label">Đạo diễn</span>
+          <span style="font-size:14px">Hwang Dong-hyuk</span>
+        </div>
+        <div class="detail-meta-row">
+          <span class="detail-meta-label">Diễn viên</span>
+          <span style="font-size:14px;color:var(--text-dim)">Lee Jung-jae, Lee Byung-hun, Yim Si-wan, Kang Ha-neul...</span>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-sm-primary">&#9654; Xem Ngay</button>
+        <button class="btn-sm-ghost">&#9825; Yêu Thích</button>
+        <button class="btn-sm-ghost">&#9654; Trailer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-synopsis">
+    <div class="synopsis-heading">Nội Dung</div>
+    <p class="synopsis-text">Gi-hun, người chiến thắng trong trò chơi năm trước, từ bỏ kế hoạch trở về Mỹ và quyết tâm tìm cách phá hủy trò chơi sinh tử từ bên trong. Anh gia nhập trò chơi lần nữa với mục đích khác, đối mặt với Front Man bí ẩn và những người tham gia mới với nhiều bí ẩn riêng...</p>
+    <div class="synopsis-more">Xem thêm ▼</div>
+  </div>
+
+  <div class="episode-section">
+    <div class="episode-heading">Danh Sách Tập</div>
+    <div class="ep-tabs">
+      <button class="ep-tab active">Vietsub #1</button>
+      <button class="ep-tab">Vietsub #2</button>
+      <button class="ep-tab">Thuyết Minh</button>
+    </div>
+    <div class="ep-grid">
+      <button class="ep-btn">Tập 1</button>
+      <button class="ep-btn">Tập 2</button>
+      <button class="ep-btn">Tập 3</button>
+      <button class="ep-btn active">Tập 4</button>
+      <button class="ep-btn">Tập 5</button>
+      <button class="ep-btn">Tập 6</button>
+      <button class="ep-btn">Tập 7</button>
+    </div>
+  </div>
+
+  <div class="carousel-section">
+    <div class="carousel-header"><div class="carousel-title">Phim Liên Quan</div></div>
+    <div class="carousel-wrap">
+      <div class="carousel-track">
+        <div class="movie-card"><div class="movie-poster-ph p3" style="width:150px;aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Sweet Home 3</div><div class="mc-year">2024</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p5" style="width:150px;aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">All of Us Are Dead</div><div class="mc-year">2022</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p7" style="width:150px;aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Black Mirror S6</div><div class="mc-year">2023</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p2" style="width:150px;aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Hellbound</div><div class="mc-year">2021</div></div></div>
+        <div class="movie-card"><div class="movie-poster-ph p4" style="width:150px;aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Dark S3</div><div class="mc-year">2020</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════ PAGE 4: WATCH ══ -->
+<section class="page-section" id="page-watch">
+  <header class="site-header sticky">
+    <div class="site-logo">VibePHim</div>
+    <nav class="site-nav"><a class="site-nav-link">&#8592; Quay lại</a></nav>
+    <div class="site-header-actions"><button class="icon-btn">&#9825;</button></div>
+  </header>
+
+  <div class="player-wrap">
+    <div class="player-placeholder p2">
+      <div class="player-spinner"></div>
+    </div>
+    <div class="player-title-bar">Squid Game S2 — Tập 4: Trái Tim Bị Bán</div>
+    <div class="player-controls">
+      <div class="seekbar-wrap">
+        <div class="seekbar">
+          <div class="seekbar-buf"></div>
+          <div class="seekbar-played"></div>
+          <div class="seekbar-thumb"></div>
+        </div>
+      </div>
+      <div class="player-row">
+        <button class="player-btn">&#9654;</button>
+        <button class="player-btn" style="font-size:14px">&#9664;&#9664;</button>
+        <button class="player-btn" style="font-size:14px">&#9654;&#9654;</button>
+        <span class="player-time">23:14 / 41:52</span>
+        <div class="player-spacer"></div>
+        <button class="player-btn">&#128264;</button>
+        <select class="player-quality">
+          <option>Auto</option>
+          <option>1080p</option>
+          <option>720p</option>
+          <option>480p</option>
+        </select>
+        <button class="player-btn">&#x26F6;</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="player-compact">
+    <div>
+      <div class="player-compact-title">Squid Game: Season 2</div>
+      <div class="player-compact-meta">Tập 4 · Trái Tim Bị Bán &nbsp;·&nbsp; 2024 &nbsp;·&nbsp; Hàn Quốc</div>
+    </div>
+    <div class="player-compact-badges">
+      <span class="badge badge-q" style="position:static">HD</span>
+      <span class="badge" style="background:var(--surface-raised);color:var(--text-dim);border:1px solid var(--border-bright)">Vietsub</span>
+    </div>
+  </div>
+
+  <div class="episode-section" style="padding-top:var(--sp-5)">
+    <div class="episode-heading">Danh Sách Tập</div>
+    <div class="ep-tabs">
+      <button class="ep-tab active">Vietsub #1</button>
+      <button class="ep-tab">Vietsub #2</button>
+    </div>
+    <div class="ep-grid">
+      <button class="ep-btn">Tập 1</button>
+      <button class="ep-btn">Tập 2</button>
+      <button class="ep-btn">Tập 3</button>
+      <button class="ep-btn active">Tập 4</button>
+      <button class="ep-btn">Tập 5</button>
+      <button class="ep-btn">Tập 6</button>
+      <button class="ep-btn">Tập 7</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ PAGE 5: SEARCH ══ -->
+<section class="page-section" id="page-search">
+  <header class="site-header sticky">
+    <div class="site-logo">VibePHim</div>
+    <nav class="site-nav">
+      <a class="site-nav-link">Trang Chủ</a>
+      <a class="site-nav-link">Phim Bộ</a>
+      <a class="site-nav-link">Phim Lẻ</a>
+    </nav>
+    <div class="site-header-actions">
+      <button class="icon-btn">&#9825;</button>
+      <button class="icon-btn">&#128336;</button>
+    </div>
+  </header>
+
+  <div class="search-wrap">
+    <div class="search-input-wrap">
+      <span class="search-ico">&#128269;</span>
+      <input class="search-input" type="text" value="squid game" placeholder="Tìm kiếm phim...">
+      <button class="search-clear">&#10005;</button>
+    </div>
+  </div>
+
+  <div class="search-label">Kết quả cho <strong style="color:var(--text)">"squid game"</strong> — 12 phim</div>
+
+  <div style="padding: var(--sp-5) 0 0" id="search-results">
+    <div class="movie-grid">
+      <div class="movie-card"><div class="movie-poster-ph p1" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Tập 7</span><div class="mc-overlay"><div class="mc-overlay-title">Squid Game S2</div></div><div class="mc-info"><div class="mc-title">Squid Game S2</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p3" style="aspect-ratio:2/3"></div><span class="badge badge-q">FHD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Squid Game S1</div><div class="mc-year">2021</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p5" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Squid Game: The Challenge</div><div class="mc-year">2023</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p7" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Squid Game Fan Cut</div><div class="mc-year">2022</div></div></div>
+    </div>
+  </div>
+
+  <div id="search-empty" class="empty-state" style="display:none">
+    <div class="empty-icon">&#128269;</div>
+    <div class="empty-title">Không tìm thấy phim nào</div>
+    <p class="empty-desc">Thử từ khóa khác hoặc kiểm tra lại chính tả.</p>
+    <button class="btn-primary">Xem Phim Mới Cập Nhật</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ PAGE 6: CATEGORY ══ -->
+<section class="page-section" id="page-category">
+  <header class="site-header sticky">
+    <div class="site-logo">VibePHim</div>
+    <nav class="site-nav">
+      <a class="site-nav-link">Trang Chủ</a>
+      <a class="site-nav-link">Phim Bộ</a>
+      <a class="site-nav-link">Phim Lẻ</a>
+    </nav>
+    <div class="site-header-actions">
+      <button class="icon-btn">&#128269;</button>
+    </div>
+  </header>
+
+  <div class="page-title-bar">
+    <div>
+      <div class="page-title">Phim Hành Động</div>
+      <div class="page-subtitle">234 phim · /the-loai/hanh-dong</div>
+    </div>
+  </div>
+
+  <div style="padding: var(--sp-5) 0 0">
+    <div class="movie-grid">
+      <div class="movie-card"><div class="movie-poster-ph p3" style="aspect-ratio:2/3"></div><span class="badge badge-q">FHD</span><span class="badge badge-ep">Full</span><div class="mc-overlay"><div class="mc-overlay-title">Deadpool &amp; Wolverine</div></div><div class="mc-info"><div class="mc-title">Deadpool &amp; Wolverine</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p1" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><span class="badge badge-ep">Full</span><div class="mc-info"><div class="mc-title">Dune Part Two</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p5" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Twisters</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p7" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Alien: Romulus</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p2" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Civil War</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p4" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Kingdom of the Planet of Apes</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p6" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">The Fall Guy</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p8" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Furiosa</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p3" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Bad Boys: Ride or Die</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card"><div class="movie-poster-ph p1" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><div class="mc-info"><div class="mc-title">Argylle</div><div class="mc-year">2024</div></div></div>
+    </div>
+    <div class="pagination">
+      <button class="page-btn">&#171;</button>
+      <button class="page-btn">&#8249;</button>
+      <button class="page-btn current">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn dots">···</button>
+      <button class="page-btn">12</button>
+      <button class="page-btn">&#8250;</button>
+      <button class="page-btn">&#187;</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════ PAGE 7: FAVORITES ══ -->
+<section class="page-section" id="page-favorites">
+  <header class="site-header sticky">
+    <div class="site-logo">VibePHim</div>
+    <nav class="site-nav"><a class="site-nav-link">Trang Chủ</a></nav>
+    <div class="site-header-actions"><button class="icon-btn">&#128269;</button></div>
+  </header>
+
+  <div class="page-title-bar">
+    <div>
+      <div class="page-title">&#9825; Phim Yêu Thích</div>
+      <div class="page-subtitle">12 phim đã lưu</div>
+    </div>
+    <button class="btn-danger">Xóa tất cả</button>
+  </div>
+
+  <div style="padding: var(--sp-5) 0 var(--sp-8)">
+    <div class="movie-grid">
+      <div class="movie-card" style="position:relative"><div class="movie-poster-ph p1" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><button class="mc-remove">&#10005;</button><div class="mc-info"><div class="mc-title">Squid Game S2</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card" style="position:relative"><div class="movie-poster-ph p3" style="aspect-ratio:2/3"></div><span class="badge badge-q">FHD</span><button class="mc-remove">&#10005;</button><div class="mc-info"><div class="mc-title">Oppenheimer</div><div class="mc-year">2023</div></div></div>
+      <div class="movie-card" style="position:relative"><div class="movie-poster-ph p5" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><button class="mc-remove">&#10005;</button><div class="mc-info"><div class="mc-title">The Last of Us S2</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card" style="position:relative"><div class="movie-poster-ph p7" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><button class="mc-remove">&#10005;</button><div class="mc-info"><div class="mc-title">Shogun</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card" style="position:relative"><div class="movie-poster-ph p2" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><button class="mc-remove">&#10005;</button><div class="mc-info"><div class="mc-title">Dune Part Two</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card" style="position:relative"><div class="movie-poster-ph p4" style="aspect-ratio:2/3"></div><span class="badge badge-q">FHD</span><button class="mc-remove">&#10005;</button><div class="mc-info"><div class="mc-title">Deadpool &amp; Wolverine</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card" style="position:relative"><div class="movie-poster-ph p6" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><button class="mc-remove">&#10005;</button><div class="mc-info"><div class="mc-title">Vincenzo</div><div class="mc-year">2021</div></div></div>
+      <div class="movie-card" style="position:relative"><div class="movie-poster-ph p8" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><button class="mc-remove">&#10005;</button><div class="mc-info"><div class="mc-title">Sweet Home 3</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card" style="position:relative"><div class="movie-poster-ph p1" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><button class="mc-remove">&#10005;</button><div class="mc-info"><div class="mc-title">Severance S2</div><div class="mc-year">2024</div></div></div>
+      <div class="movie-card" style="position:relative"><div class="movie-poster-ph p3" style="aspect-ratio:2/3"></div><span class="badge badge-q">HD</span><button class="mc-remove">&#10005;</button><div class="mc-info"><div class="mc-title">Poor Things</div><div class="mc-year">2023</div></div></div>
+    </div>
+  </div>
+  <footer class="site-footer">© 2024 VibePHim</footer>
+</section>
+
+<!-- ══════════════════════════════════════ PAGE 8: HISTORY ══ -->
+<section class="page-section" id="page-history">
+  <header class="site-header sticky">
+    <div class="site-logo">VibePHim</div>
+    <nav class="site-nav"><a class="site-nav-link">Trang Chủ</a></nav>
+    <div class="site-header-actions"><button class="icon-btn">&#128269;</button></div>
+  </header>
+
+  <div class="page-title-bar">
+    <div>
+      <div class="page-title">&#128336; Lịch Sử Xem</div>
+      <div class="page-subtitle">48 phim đã xem</div>
+    </div>
+    <button class="btn-danger">Xóa Lịch Sử</button>
+  </div>
+
+  <div class="history-list">
+    <div class="history-item">
+      <div class="history-thumb"><div class="p1" style="width:100%;height:100%;border-radius:var(--r-xs)"></div></div>
+      <div class="history-info">
+        <div class="history-title">Squid Game: Season 2</div>
+        <div class="history-episode">Tập 4 · Trái Tim Bị Bán</div>
+        <div class="progress-wrap"><div class="progress-fill" style="width:65%"></div></div>
+        <div class="history-meta"><span>23:14 / 41:52</span><span>2 giờ trước</span></div>
+      </div>
+      <div class="history-action"><button class="btn-continue">&#9654; Tiếp tục</button></div>
+    </div>
+
+    <div class="history-item">
+      <div class="history-thumb"><div class="p3" style="width:100%;height:100%;border-radius:var(--r-xs)"></div></div>
+      <div class="history-info">
+        <div class="history-title">The Last of Us: Season 2</div>
+        <div class="history-episode">Tập 3 · Through the Valley</div>
+        <div class="progress-wrap"><div class="progress-fill" style="width:18%"></div></div>
+        <div class="history-meta"><span>8:42 / 48:00</span><span>Hôm qua</span></div>
+      </div>
+      <div class="history-action"><button class="btn-continue">&#9654; Tiếp tục</button></div>
+    </div>
+
+    <div class="history-item">
+      <div class="history-thumb"><div class="p2" style="width:100%;height:100%;border-radius:var(--r-xs)"></div></div>
+      <div class="history-info">
+        <div class="history-title">Oppenheimer</div>
+        <div class="history-episode">Full · Hoàn thành</div>
+        <div class="progress-wrap"><div class="progress-fill done" style="width:100%"></div></div>
+        <div class="history-meta"><span>3:00:00 / 3:00:00</span><span>3 ngày trước</span></div>
+      </div>
+      <div class="history-action"><button class="btn-continue replay">&#9654; Xem lại</button></div>
+    </div>
+
+    <div class="history-item">
+      <div class="history-thumb"><div class="p5" style="width:100%;height:100%;border-radius:var(--r-xs)"></div></div>
+      <div class="history-info">
+        <div class="history-title">Shogun</div>
+        <div class="history-episode">Tập 10 · Crimson Sky</div>
+        <div class="progress-wrap"><div class="progress-fill" style="width:82%"></div></div>
+        <div class="history-meta"><span>42:18 / 51:00</span><span>5 ngày trước</span></div>
+      </div>
+      <div class="history-action"><button class="btn-continue">&#9654; Tiếp tục</button></div>
+    </div>
+
+    <div class="history-item">
+      <div class="history-thumb"><div class="p7" style="width:100%;height:100%;border-radius:var(--r-xs)"></div></div>
+      <div class="history-info">
+        <div class="history-title">Dune: Part Two</div>
+        <div class="history-episode">Full · Hoàn thành</div>
+        <div class="progress-wrap"><div class="progress-fill done" style="width:100%"></div></div>
+        <div class="history-meta"><span>2:46:00 / 2:46:00</span><span>1 tuần trước</span></div>
+      </div>
+      <div class="history-action"><button class="btn-continue replay">&#9654; Xem lại</button></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">© 2024 VibePHim</footer>
+</section>
+
+<script>
+(function () {
+  /* Theme */
+  var t = document.getElementById('themeToggle');
+  var s = localStorage.getItem('vp-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', s);
+  t.textContent = s === 'dark' ? '☀' : '☾';
+  t.addEventListener('click', function () {
+    var c = document.documentElement.getAttribute('data-theme') || 'dark';
+    var n = c === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', n);
+    localStorage.setItem('vp-theme', n);
+    t.textContent = n === 'dark' ? '☀' : '☾';
+  });
+
+  /* Page nav */
+  var btns = document.querySelectorAll('.page-nav-btn');
+  var pages = document.querySelectorAll('.page-section');
+  btns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      btns.forEach(function (x) { x.classList.remove('active'); });
+      pages.forEach(function (x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      var pg = document.getElementById('page-' + b.getAttribute('data-page'));
+      if (pg) { pg.classList.add('active'); window.scrollTo(0, 0); }
+    });
+  });
+
+  /* Carousel arrows */
+  document.querySelectorAll('.carousel-wrap').forEach(function (w) {
+    var tr = w.querySelector('.carousel-track');
+    var l = w.querySelector('.carousel-arrow.left');
+    var r = w.querySelector('.carousel-arrow.right');
+    if (l) l.addEventListener('click', function () { tr.scrollBy({ left: -480, behavior: 'smooth' }); });
+    if (r) r.addEventListener('click', function () { tr.scrollBy({ left: 480, behavior: 'smooth' }); });
+  });
+
+  /* Episode tabs */
+  document.querySelectorAll('.ep-tabs').forEach(function (tabs) {
+    tabs.querySelectorAll('.ep-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.querySelectorAll('.ep-tab').forEach(function (x) { x.classList.remove('active'); });
+        tab.classList.add('active');
+      });
+    });
+  });
+
+  /* Episode buttons */
+  document.querySelectorAll('.ep-grid').forEach(function (grid) {
+    grid.querySelectorAll('.ep-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        grid.querySelectorAll('.ep-btn').forEach(function (x) { x.classList.remove('active'); });
+        btn.classList.add('active');
+      });
+    });
+  });
+
+  /* Remove favorite */
+  document.querySelectorAll('.mc-remove').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var card = btn.closest('.movie-card');
+      if (card) {
+        card.style.transition = 'opacity 0.2s, transform 0.2s';
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.88)';
+        setTimeout(function () { card.remove(); }, 220);
+      }
+    });
+  });
+
+  /* Seekbar click */
+  var sb = document.querySelector('.seekbar');
+  if (sb) {
+    sb.addEventListener('click', function (e) {
+      var r = sb.getBoundingClientRect();
+      var pct = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * 100;
+      var p = sb.querySelector('.seekbar-played');
+      var th = sb.querySelector('.seekbar-thumb');
+      if (p) p.style.width = pct + '%';
+      if (th) th.style.left = pct + '%';
+    });
+  }
+
+  /* Search empty state */
+  var inp = document.querySelector('.search-input');
+  var res = document.getElementById('search-results');
+  var emp = document.getElementById('search-empty');
+  if (inp && res && emp) {
+    inp.addEventListener('input', function () {
+      var v = inp.value.trim();
+      if (!v) {
+        res.style.display = 'none';
+        emp.style.display = 'block';
+      } else {
+        res.style.display = 'block';
+        emp.style.display = 'none';
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
