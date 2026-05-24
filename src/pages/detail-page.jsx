@@ -5,6 +5,7 @@ import { getImageUrl } from '../services/ophim-api.js'
 import EpisodeSection from '../components/movie/episode-section.jsx'
 import { useFavorites } from '../contexts/favorites-context.jsx'
 import { SkeletonBanner } from '../components/ui/skeleton.jsx'
+import TrailerModal from '../components/ui/trailer-modal.jsx'
 
 function sanitizeHtml(html = '') {
   return html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '')
@@ -98,6 +99,7 @@ function DetailSkeleton() {
 
 // ── Action bar ───────────────────────────────────────────────────────────────
 function ActionBar({ onPlay, favorited, onToggleFavorite, trailerUrl }) {
+  const [trailerOpen, setTrailerOpen] = useState(false)
   return (
     <div className="flex flex-wrap items-center gap-2">
       <button
@@ -135,10 +137,8 @@ function ActionBar({ onPlay, favorited, onToggleFavorite, trailerUrl }) {
       </button>
 
       {trailerUrl && (
-        <a
-          href={trailerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={() => setTrailerOpen(true)}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-white transition-colors duration-150"
           style={{ padding: '9px 14px', borderRadius: '6px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}
           onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)' }}
@@ -146,8 +146,9 @@ function ActionBar({ onPlay, favorited, onToggleFavorite, trailerUrl }) {
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
           Trailer
-        </a>
+        </button>
       )}
+      {trailerOpen && <TrailerModal url={trailerUrl} onClose={() => setTrailerOpen(false)} />}
     </div>
   )
 }

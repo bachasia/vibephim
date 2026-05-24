@@ -1,6 +1,8 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getImageUrl } from '../../services/ophim-api.js'
 import { useFavorites } from '../../contexts/favorites-context.jsx'
+import TrailerModal from '../ui/trailer-modal.jsx'
 
 function Chip({ to, label }) {
   return (
@@ -32,6 +34,7 @@ function sanitizeHtml(html = '') {
 
 export default function MovieInfo({ movie }) {
   const { isFavorite, addFavorite, removeFavorite } = useFavorites()
+  const [trailerOpen, setTrailerOpen] = useState(false)
   if (!movie) return null
 
   const favorited = isFavorite(movie.slug)
@@ -140,10 +143,8 @@ export default function MovieInfo({ movie }) {
 
           {/* Trailer */}
           {trailer_url && (
-            <a
-              href={trailer_url}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => setTrailerOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-sm transition-colors"
               style={{ background: 'var(--bg-3)' }}
               onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-4)' }}
@@ -151,8 +152,9 @@ export default function MovieInfo({ movie }) {
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21" /></svg>
               Xem Trailer
-            </a>
+            </button>
           )}
+          {trailerOpen && <TrailerModal url={trailer_url} onClose={() => setTrailerOpen(false)} />}
         </div>
 
         {/* Synopsis */}
