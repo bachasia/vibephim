@@ -32,7 +32,7 @@ export default function EpisodeSection({ episodes = [], movieSlug, currentEpSlug
               style={{
                 border: 'none',
                 background: 'transparent',
-                borderBottom: i === activeServer ? '2px solid #e50914' : '2px solid transparent',
+                borderBottom: i === activeServer ? '2px solid var(--primary)' : '2px solid transparent',
                 marginBottom: '-1px',
                 color: i === activeServer ? '#ffffff' : '#737373',
               }}
@@ -60,22 +60,22 @@ export default function EpisodeSection({ episodes = [], movieSlug, currentEpSlug
                   minWidth: '64px',
                   padding: '8px 12px',
                   borderRadius: '2px',
-                  border: isCurrent ? '1px solid #e50914' : '1px solid rgba(255,255,255,0.15)',
-                  background: isCurrent ? '#e50914' : '#2d2d2d',
-                  color: isCurrent ? '#ffffff' : '#b3b3b3',
+                  border: isCurrent ? '1px solid var(--primary)' : '1px solid rgba(255,255,255,0.15)',
+                  background: isCurrent ? 'var(--primary)' : 'var(--bg-3)',
+                  color: isCurrent ? 'var(--primary-btn-text)' : 'var(--text-base)',
                   fontWeight: isCurrent ? '700' : '400',
                 }}
                 onMouseEnter={(e) => {
                   if (!isCurrent) {
-                    e.currentTarget.style.background = '#232323'
+                    e.currentTarget.style.background = 'var(--bg-4)'
                     e.currentTarget.style.color = '#ffffff'
                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isCurrent) {
-                    e.currentTarget.style.background = '#2d2d2d'
-                    e.currentTarget.style.color = '#b3b3b3'
+                    e.currentTarget.style.background = 'var(--bg-3)'
+                    e.currentTarget.style.color = 'var(--text-base)'
                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
                   }
                 }}

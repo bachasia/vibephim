@@ -8,7 +8,7 @@ function GridCard({ movie }) {
     <Link
       to={`/phim/${slug}`}
       className="group relative block overflow-hidden rounded-sm cursor-pointer"
-      style={{ background: '#232323', transition: 'transform 400ms ease, box-shadow 400ms ease' }}
+      style={{ background: 'var(--bg-2)', transition: 'transform 400ms ease, box-shadow 400ms ease' }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'scale(1.03)'
         e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.7)'
@@ -45,7 +45,7 @@ function GridCard({ movie }) {
         {quality && (
           <span
             className="absolute top-1.5 right-1.5 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase leading-none"
-            style={{ background: '#e50914', color: '#fff' }}
+            style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)' }}
           >
             {quality}
           </span>
@@ -63,7 +63,7 @@ function GridCard({ movie }) {
       </div>
 
       {/* Info panel */}
-      <div className="px-2 pt-2 pb-3" style={{ background: '#232323' }}>
+      <div className="px-2 pt-2 pb-3" style={{ background: 'var(--bg-2)' }}>
         <p className="text-[13px] font-semibold truncate text-white">{name}</p>
         {year && <p className="text-[11px] mt-0.5 font-mono" style={{ color: '#737373' }}>{year}</p>}
       </div>

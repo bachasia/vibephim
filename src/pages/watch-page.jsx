@@ -49,7 +49,7 @@ export default function WatchPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black pt-16 flex items-center justify-center">
+      <div className="min-h-screen pt-16 flex items-center justify-center" style={{ background: 'var(--bg-color)' }}>
         <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
       </div>
     )
@@ -57,29 +57,29 @@ export default function WatchPage() {
 
   if (error || !movie) {
     return (
-      <div className="min-h-screen bg-zinc-950 pt-20 flex items-center justify-center">
+      <div className="min-h-screen pt-20 flex items-center justify-center" style={{ background: 'var(--bg-color)' }}>
         <p className="text-zinc-400 text-sm">{error || 'Không tìm thấy phim.'}</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>
       {/* Full-width player area */}
-      <div className="w-full bg-black pt-16">
+      <div className="w-full pt-16" style={{ background: 'var(--top-bg)' }}>
         {videoSrc ? (
           <div className="max-w-6xl mx-auto">
             <VideoPlayer src={videoSrc} title={playerTitle} initialTime={initialTime} onProgress={handleProgress} />
           </div>
         ) : (
-          <div className="max-w-6xl mx-auto aspect-video flex items-center justify-center bg-zinc-900">
+          <div className="max-w-6xl mx-auto aspect-video flex items-center justify-center" style={{ background: 'var(--bg-2)' }}>
             <p className="text-zinc-500 text-sm">Không có nguồn video cho tập này.</p>
           </div>
         )}
       </div>
 
       {/* Info bar below player */}
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4 border-b border-zinc-800">
+      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
         <div className="min-w-0">
           <Link to={`/phim/${slug}`} className="text-base font-bold text-white hover:text-zinc-300 transition-colors line-clamp-1">
             {movie.name}
@@ -94,7 +94,8 @@ export default function WatchPage() {
           {prevEp && (
             <Link
               to={`/xem/${slug}/${prevEp.slug}`}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-sm transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-sm transition-colors"
+              style={{ background: 'var(--bg-3)', color: 'var(--text-base)' }}
             >
               ‹ Tập trước
             </Link>
@@ -102,8 +103,8 @@ export default function WatchPage() {
           {nextEp && (
             <Link
               to={`/xem/${slug}/${nextEp.slug}`}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white rounded-sm transition-colors"
-              style={{ background: '#e50914' }}
+              className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-sm transition-colors"
+              style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)' }}
             >
               Tập sau ›
             </Link>

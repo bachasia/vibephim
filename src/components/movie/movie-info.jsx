@@ -6,7 +6,10 @@ function Chip({ to, label }) {
   return (
     <Link
       to={to}
-      className="inline-block px-2 py-0.5 text-xs rounded-sm bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white transition-colors"
+      className="inline-block px-2 py-0.5 text-xs rounded-sm transition-colors"
+      style={{ background: 'var(--bg-3)', color: 'var(--text-base)' }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-4)'; e.currentTarget.style.color = '#fff' }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--bg-3)'; e.currentTarget.style.color = 'var(--text-base)' }}
     >
       {label}
     </Link>
@@ -69,7 +72,7 @@ export default function MovieInfo({ movie }) {
         {/* Badges */}
         <div className="flex flex-wrap gap-2 mb-5">
           {quality && (
-            <span className="px-2 py-0.5 text-xs font-bold rounded-sm" style={{ background: '#e50914', color: '#fff' }}>
+            <span className="px-2 py-0.5 text-xs font-bold rounded-sm" style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)' }}>
               {quality}
             </span>
           )}
@@ -77,7 +80,7 @@ export default function MovieInfo({ movie }) {
             <span className="px-2 py-0.5 text-xs font-medium rounded-sm bg-white/15 text-white">{lang}</span>
           )}
           {episode_current && (
-            <span className="px-2 py-0.5 text-xs rounded-sm bg-zinc-800 text-zinc-300">
+            <span className="px-2 py-0.5 text-xs rounded-sm" style={{ background: 'var(--bg-3)', color: 'var(--text-base)' }}>
               {episode_current}{episode_total ? `/${episode_total}` : ''} tập
             </span>
           )}
@@ -124,8 +127,8 @@ export default function MovieInfo({ movie }) {
             onClick={() => favorited ? removeFavorite(movie.slug) : addFavorite(movie)}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-sm border transition-colors"
             style={favorited
-              ? { background: '#e50914', color: '#fff', borderColor: '#e50914' }
-              : { background: 'transparent', color: '#a1a1aa', borderColor: 'rgba(255,255,255,0.2)' }
+              ? { background: 'var(--primary)', color: 'var(--primary-btn-text)', borderColor: 'var(--primary)' }
+              : { background: 'transparent', color: 'var(--text-base)', borderColor: 'rgba(255,255,255,0.2)' }
             }
           >
             {favorited
@@ -141,7 +144,10 @@ export default function MovieInfo({ movie }) {
               href={trailer_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-zinc-800 hover:bg-zinc-700 rounded-sm transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-sm transition-colors"
+              style={{ background: 'var(--bg-3)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-4)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--bg-3)' }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21" /></svg>
               Xem Trailer

@@ -40,11 +40,11 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
             aria-current={p === currentPage ? 'page' : undefined}
             className="w-9 h-9 rounded-sm text-sm font-medium transition-colors"
             style={p === currentPage
-              ? { background: '#e50914', color: '#fff' }
-              : { color: '#a1a1aa' }
+              ? { background: 'var(--primary)', color: 'var(--primary-btn-text)' }
+              : { color: 'var(--text-base)' }
             }
             onMouseEnter={(e) => { if (p !== currentPage) e.currentTarget.style.color = '#fff' }}
-            onMouseLeave={(e) => { if (p !== currentPage) e.currentTarget.style.color = '#a1a1aa' }}
+            onMouseLeave={(e) => { if (p !== currentPage) e.currentTarget.style.color = 'var(--text-base)' }}
           >
             {p}
           </button>

@@ -1,25 +1,50 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { MOVIE_TYPES } from '../../utils/constants.js'
+import VibephimLogo from '../ui/vibephim-logo.jsx'
+import NavDropdown from './nav-dropdown.jsx'
 
-const NAV_LINKS = [
-  { to: '/', label: 'Trang Chủ', exactPath: true, typeParam: null },
-  { to: `/browse?type=${MOVIE_TYPES.SERIES}`, label: 'Phim Bộ', exactPath: false, typeParam: MOVIE_TYPES.SERIES },
-  { to: `/browse?type=${MOVIE_TYPES.MOVIE}`, label: 'Phim Lẻ', exactPath: false, typeParam: MOVIE_TYPES.MOVIE },
-  { to: `/browse?type=${MOVIE_TYPES.ANIME}`, label: 'Hoạt Hình', exactPath: false, typeParam: MOVIE_TYPES.ANIME },
-  { to: `/browse?type=${MOVIE_TYPES.TV}`, label: 'TV Shows', exactPath: false, typeParam: MOVIE_TYPES.TV },
+const CATEGORIES = [
+  { label: 'Hành Động', to: '/the-loai/hanh-dong' },
+  { label: 'Tình Cảm', to: '/the-loai/tinh-cam' },
+  { label: 'Hài Hước', to: '/the-loai/hai-huoc' },
+  { label: 'Cổ Trang', to: '/the-loai/co-trang' },
+  { label: 'Tâm Lý', to: '/the-loai/tam-ly' },
+  { label: 'Hình Sự', to: '/the-loai/hinh-su' },
+  { label: 'Kinh Dị', to: '/the-loai/kinh-di' },
+  { label: 'Viễn Tưởng', to: '/the-loai/vien-tuong' },
+  { label: 'Phiêu Lưu', to: '/the-loai/phieu-luu' },
+  { label: 'Thần Thoại', to: '/the-loai/than-thoai' },
+  { label: 'Võ Thuật', to: '/the-loai/vo-thuat' },
+  { label: 'Âm Nhạc', to: '/the-loai/am-nhac' },
 ]
 
-function useNavActive() {
-  const { pathname, search } = useLocation()
-  const params = new URLSearchParams(search)
-  const currentType = params.get('type') || ''
-  return { pathname, currentType }
-}
+const COUNTRIES = [
+  { label: 'Hàn Quốc', to: '/quoc-gia/han-quoc' },
+  { label: 'Trung Quốc', to: '/quoc-gia/trung-quoc' },
+  { label: 'Âu Mỹ', to: '/quoc-gia/au-my' },
+  { label: 'Nhật Bản', to: '/quoc-gia/nhat-ban' },
+  { label: 'Thái Lan', to: '/quoc-gia/thai-lan' },
+  { label: 'Hồng Kông', to: '/quoc-gia/hong-kong' },
+  { label: 'Việt Nam', to: '/quoc-gia/viet-nam' },
+  { label: 'Anh', to: '/quoc-gia/anh' },
+  { label: 'Pháp', to: '/quoc-gia/phap' },
+  { label: 'Đài Loan', to: '/quoc-gia/dai-loan' },
+  { label: 'Ấn Độ', to: '/quoc-gia/an-do' },
+  { label: 'Khác', to: '/quoc-gia/quoc-gia-khac' },
+]
 
-function isNavActive(link, pathname, currentType) {
-  if (link.exactPath) return pathname === link.to
-  if (link.typeParam) return pathname === '/browse' && currentType === link.typeParam
+const NAV_LINKS = [
+  { to: '/', label: 'Trang Chủ', exact: true },
+  { to: `/browse?type=${MOVIE_TYPES.SERIES}`, label: 'Phim Bộ', type: MOVIE_TYPES.SERIES },
+  { to: `/browse?type=${MOVIE_TYPES.MOVIE}`, label: 'Phim Lẻ', type: MOVIE_TYPES.MOVIE },
+  { to: `/browse?type=${MOVIE_TYPES.ANIME}`, label: 'Hoạt Hình', type: MOVIE_TYPES.ANIME },
+  { to: `/browse?type=${MOVIE_TYPES.TV}`, label: 'TV Shows', type: MOVIE_TYPES.TV },
+]
+
+function isActive(link, pathname, currentType) {
+  if (link.exact) return pathname === '/'
+  if (link.type) return pathname === '/browse' && currentType === link.type
   return false
 }
 
@@ -30,8 +55,8 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const searchInputRef = useRef(null)
   const navigate = useNavigate()
-  const { pathname } = useLocation()
-  const { pathname: navPath, currentType } = useNavActive()
+  const { pathname, search } = useLocation()
+  const currentType = new URLSearchParams(search).get('type') || ''
 
   useEffect(() => { setMenuOpen(false) }, [pathname])
 
@@ -63,53 +88,49 @@ export default function Header() {
     setSearchValue('')
   }
 
-  function handleSearchKeyDown(e) {
-    if (e.key === 'Escape') { setSearchOpen(false); setSearchValue('') }
-  }
+  const headerBg = scrolled
+    ? 'rgba(15,17,26,0.97)'
+    : 'linear-gradient(to bottom, rgba(15,17,26,0.92) 0%, transparent 100%)'
 
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled
-          ? 'rgba(0,0,0,0.95)'
-          : 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%)',
-        backdropFilter: scrolled ? 'blur(8px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.08)' : 'none',
+        height: '70px',
+        background: headerBg,
+        backdropFilter: scrolled ? 'blur(10px)' : 'none',
+        borderBottom: scrolled ? '1px solid var(--border-color)' : 'none',
       }}
     >
-      <div className="px-8 h-16 flex items-center gap-8">
+      <div className="h-full px-6 md:px-10 flex items-center gap-4 md:gap-6">
         {/* Logo */}
-        <Link
-          to="/"
-          className="flex-shrink-0 text-2xl font-black uppercase"
-          style={{ color: '#e50914', letterSpacing: '-1px' }}
-        >
-          VibePHim
+        <Link to="/" className="flex-shrink-0">
+          <VibephimLogo iconSize={28} fontSize={18} />
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1 flex-1">
+        <nav className="hidden md:flex items-center gap-0.5 flex-1">
           {NAV_LINKS.map((link) => {
-            const active = isNavActive(link, navPath, currentType)
+            const active = isActive(link, pathname, currentType)
             return (
               <Link
                 key={link.to}
                 to={link.to}
-                className="px-3 py-1.5 rounded-sm text-sm transition-colors duration-200 whitespace-nowrap"
-                style={{ color: active ? '#ffffff' : '#b3b3b3', fontWeight: active ? '700' : '500' }}
-                onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = '#ffffff' }}
+                className="px-3 py-1.5 rounded text-sm transition-colors duration-200 whitespace-nowrap"
+                style={{ color: active ? 'var(--primary)' : '#b3b3b3', fontWeight: active ? '600' : '400' }}
+                onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = '#fff' }}
                 onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = '#b3b3b3' }}
               >
                 {link.label}
               </Link>
             )
           })}
+          <NavDropdown label="Thể Loại" items={CATEGORIES} columns={3} />
+          <NavDropdown label="Quốc Gia" items={COUNTRIES} columns={3} />
         </nav>
 
         {/* Right actions */}
         <div className="flex items-center gap-1 ml-auto flex-shrink-0">
-          {/* Search */}
           {searchOpen ? (
             <form onSubmit={handleSearchSubmit} className="flex items-center">
               <input
@@ -117,23 +138,27 @@ export default function Header() {
                 type="search"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
-                onKeyDown={handleSearchKeyDown}
+                onKeyDown={(e) => { if (e.key === 'Escape') { setSearchOpen(false); setSearchValue('') } }}
                 placeholder="Tìm phim, diễn viên..."
-                aria-label="Tìm kiếm phim"
-                className="w-44 md:w-56 h-9 px-3 text-sm text-white bg-black border border-white/30 rounded-sm outline-none focus:border-white/60 transition-colors"
+                aria-label="Tìm kiếm"
+                className="w-44 md:w-60 h-9 px-3 text-sm text-white bg-transparent border rounded outline-none transition-colors"
+                style={{ borderColor: 'var(--bg-4)', background: 'var(--bg-2)' }}
               />
               <button
                 type="button"
                 onClick={() => { setSearchOpen(false); setSearchValue('') }}
-                aria-label="Đóng tìm kiếm"
-                className="ml-2 w-8 h-8 flex items-center justify-center text-[#b3b3b3] hover:text-white transition-colors"
+                className="ml-2 w-8 h-8 flex items-center justify-center transition-colors"
+                style={{ color: 'var(--text-base)' }}
               >✕</button>
             </form>
           ) : (
             <button
               onClick={() => setSearchOpen(true)}
               aria-label="Tìm kiếm"
-              className="w-8 h-8 flex items-center justify-center text-[#b3b3b3] hover:text-white transition-colors rounded-sm"
+              className="w-9 h-9 flex items-center justify-center rounded transition-colors"
+              style={{ color: 'var(--text-base)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = '#fff' }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-base)' }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -141,35 +166,35 @@ export default function Header() {
             </button>
           )}
 
-          {/* Favorites */}
-          <Link
-            to="/yeu-thich"
-            aria-label="Phim yêu thích"
-            className="w-8 h-8 hidden md:flex items-center justify-center text-[#b3b3b3] hover:text-white transition-colors rounded-sm"
+          <Link to="/yeu-thich" aria-label="Yêu thích"
+            className="w-9 h-9 hidden md:flex items-center justify-center rounded transition-colors"
+            style={{ color: 'var(--text-base)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-base)' }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </Link>
 
-          {/* History */}
-          <Link
-            to="/lich-su"
-            aria-label="Lịch sử xem"
-            className="w-8 h-8 hidden md:flex items-center justify-center text-[#b3b3b3] hover:text-white transition-colors rounded-sm"
+          <Link to="/lich-su" aria-label="Lịch sử"
+            className="w-9 h-9 hidden md:flex items-center justify-center rounded transition-colors"
+            style={{ color: 'var(--text-base)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-base)' }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
+              <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
             </svg>
           </Link>
 
-          {/* Hamburger (mobile only) */}
+          {/* Hamburger (mobile) */}
           <button
             data-mobile-menu
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'}
-            className="md:hidden w-8 h-8 flex items-center justify-center text-[#b3b3b3] hover:text-white transition-colors"
+            className="md:hidden w-9 h-9 flex items-center justify-center transition-colors"
+            style={{ color: 'var(--text-base)' }}
           >
             {menuOpen
               ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
@@ -179,29 +204,45 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* Mobile menu */}
       {menuOpen && (
         <nav
           data-mobile-menu
-          className="md:hidden border-t border-white/10 px-8 py-4 flex flex-col gap-4"
-          style={{ background: 'rgba(0,0,0,0.97)' }}
+          className="md:hidden px-6 py-4 flex flex-col gap-3"
+          style={{ background: 'rgba(15,17,26,0.99)', borderTop: '1px solid var(--border-color)' }}
         >
           {NAV_LINKS.map((link) => {
-            const active = isNavActive(link, navPath, currentType)
+            const active = isActive(link, pathname, currentType)
             return (
-              <Link
-                key={link.to}
-                to={link.to}
+              <Link key={link.to} to={link.to}
                 className="text-sm py-1 transition-colors"
-                style={{ color: active ? '#ffffff' : '#b3b3b3', fontWeight: active ? '700' : '500' }}
+                style={{ color: active ? 'var(--primary)' : '#b3b3b3', fontWeight: active ? '600' : '400' }}
               >
                 {link.label}
               </Link>
             )
           })}
-          <div className="flex gap-4 pt-2 border-t border-white/10">
-            <Link to="/yeu-thich" className="text-sm text-[#b3b3b3] hover:text-white transition-colors">♡ Yêu Thích</Link>
-            <Link to="/lich-su" className="text-sm text-[#b3b3b3] hover:text-white transition-colors">⏱ Lịch Sử</Link>
+          <div className="pt-2 border-t" style={{ borderColor: 'var(--border-color)' }}>
+            <p className="text-xs mb-2 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Thể Loại</p>
+            <div className="grid grid-cols-3 gap-1">
+              {CATEGORIES.map((c) => (
+                <Link key={c.to} to={c.to} className="text-xs py-1 transition-colors truncate" style={{ color: '#b3b3b3' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#b3b3b3' }}
+                >{c.label}</Link>
+              ))}
+            </div>
+          </div>
+          <div className="pt-2 border-t" style={{ borderColor: 'var(--border-color)' }}>
+            <p className="text-xs mb-2 uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Quốc Gia</p>
+            <div className="grid grid-cols-3 gap-1">
+              {COUNTRIES.map((c) => (
+                <Link key={c.to} to={c.to} className="text-xs py-1 transition-colors truncate" style={{ color: '#b3b3b3' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#b3b3b3' }}
+                >{c.label}</Link>
+              ))}
+            </div>
           </div>
         </nav>
       )}

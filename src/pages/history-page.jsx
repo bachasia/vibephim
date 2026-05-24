@@ -32,7 +32,7 @@ function HistoryItem({ entry }) {
       className="flex gap-5 transition-colors duration-200"
       style={{
         padding: '20px',
-        background: '#141414',
+        background: 'var(--bg-color)',
         borderRadius: '4px',
         border: '1px solid rgba(255,255,255,0.1)',
       }}
@@ -43,7 +43,7 @@ function HistoryItem({ entry }) {
       <Link
         to={`/xem/${slug}/${episode}`}
         className="flex-shrink-0 overflow-hidden rounded-sm"
-        style={{ width: '128px', aspectRatio: '16/9', background: '#232323' }}
+        style={{ width: '128px', aspectRatio: '16/9', background: 'var(--bg-2)' }}
       >
         <img
           src={getImageUrl(thumb_url)}
@@ -68,12 +68,12 @@ function HistoryItem({ entry }) {
         )}
 
         {/* Progress bar */}
-        <div className="rounded-sm overflow-hidden" style={{ height: '3px', background: '#2d2d2d' }}>
+        <div className="rounded-sm overflow-hidden" style={{ height: '3px', background: 'var(--bg-3)' }}>
           <div
             className="h-full rounded-sm"
             style={{
               width: `${pct}%`,
-              background: done ? '#46d369' : '#e50914',
+              background: done ? '#46d369' : 'var(--primary)',
             }}
           />
         </div>
@@ -102,18 +102,18 @@ function HistoryItem({ entry }) {
               }
             : {
                 padding: '8px 16px',
-                border: '1px solid #e50914',
+                border: '1px solid var(--primary)',
                 borderRadius: '4px',
-                color: '#e50914',
-                background: 'rgba(229,9,20,0.12)',
+                color: 'var(--primary)',
+                background: 'rgba(255,216,117,0.1)',
               }
           }
           onMouseEnter={(e) => {
             if (done) {
-              e.currentTarget.style.background = '#2d2d2d'
+              e.currentTarget.style.background = 'var(--bg-3)'
               e.currentTarget.style.color = '#fff'
             } else {
-              e.currentTarget.style.background = '#e50914'
+              e.currentTarget.style.background = 'var(--primary)'
               e.currentTarget.style.color = '#fff'
             }
           }}
@@ -123,7 +123,7 @@ function HistoryItem({ entry }) {
               e.currentTarget.style.color = '#b3b3b3'
             } else {
               e.currentTarget.style.background = 'rgba(229,9,20,0.12)'
-              e.currentTarget.style.color = '#e50914'
+              e.currentTarget.style.color = 'var(--primary)'
             }
           }}
         >
@@ -138,7 +138,7 @@ export default function HistoryPage() {
   const { history, clearHistory } = useWatchHistory()
 
   return (
-    <div className="min-h-screen text-white" style={{ background: '#000' }}>
+    <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>
       {/* Page title bar */}
       <div
         className="flex items-center justify-between px-8 pt-24 pb-5"
@@ -156,10 +156,10 @@ export default function HistoryPage() {
             className="text-sm transition-all duration-200"
             style={{
               padding: '8px 16px',
-              border: '1px solid rgba(229,9,20,0.5)',
+              border: '1px solid rgba(255,216,117,0.4)',
               borderRadius: '2px',
               background: 'transparent',
-              color: '#e50914',
+              color: 'var(--primary)',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(229,9,20,0.12)' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
@@ -173,7 +173,7 @@ export default function HistoryPage() {
       {history.length === 0 ? (
         <div className="py-20 text-center px-8">
           <p className="text-sm mb-4" style={{ color: '#737373' }}>Chưa xem phim nào.</p>
-          <Link to="/" className="text-sm font-medium" style={{ color: '#e50914' }}>
+          <Link to="/" className="text-sm font-medium" style={{ color: 'var(--primary)' }}>
             Xem phim ngay →
           </Link>
         </div>

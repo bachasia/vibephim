@@ -24,7 +24,7 @@ const YEAR_OPTIONS = [
 
 const SELECT_STYLE = {
   padding: '8px 32px 8px 12px',
-  background: '#2d2d2d',
+  background: 'var(--bg-3)',
   border: '1px solid rgba(255,255,255,0.2)',
   borderRadius: '2px',
   color: '#ffffff',
@@ -141,7 +141,7 @@ export default function BrowsePage() {
         className="sticky z-10 flex flex-wrap items-center gap-3 px-8 py-3"
         style={{
           top: '64px',
-          background: '#232323',
+          background: 'var(--bg-2)',
           borderBottom: '1px solid rgba(255,255,255,0.1)',
         }}
       >
@@ -177,7 +177,7 @@ export default function BrowsePage() {
               background: 'transparent',
               color: '#b3b3b3',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = '#2d2d2d' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'var(--bg-3)' }}
             onMouseLeave={(e) => { e.currentTarget.style.color = '#b3b3b3'; e.currentTarget.style.background = 'transparent' }}
           >
             Đặt lại

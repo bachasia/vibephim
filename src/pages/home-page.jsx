@@ -1,16 +1,9 @@
 import { useState, useEffect } from 'react'
-import { getNewestMovies, getMoviesByType } from '../services/ophim-api.js'
+import { getNewestMovies, getMoviesByType, getMoviesByCountry } from '../services/ophim-api.js'
 import { MOVIE_TYPES } from '../utils/constants.js'
 import HeroBanner from '../components/movie/hero-banner.jsx'
 import MovieCarousel from '../components/movie/movie-carousel.jsx'
-
-const CAROUSELS = [
-  { key: 'newest',              title: 'Phim Mới Cập Nhật', browseLink: '/browse' },
-  { key: MOVIE_TYPES.SERIES,    title: 'Phim Bộ',           browseLink: `/browse?type=${MOVIE_TYPES.SERIES}` },
-  { key: MOVIE_TYPES.MOVIE,     title: 'Phim Lẻ',           browseLink: `/browse?type=${MOVIE_TYPES.MOVIE}` },
-  { key: MOVIE_TYPES.ANIME,     title: 'Hoạt Hình',         browseLink: `/browse?type=${MOVIE_TYPES.ANIME}` },
-  { key: MOVIE_TYPES.TV,        title: 'TV Shows',           browseLink: `/browse?type=${MOVIE_TYPES.TV}` },
-]
+import Top10Carousel from '../components/movie/top10-carousel.jsx'
 
 export default function HomePage() {
   const [data, setData] = useState({})
@@ -23,19 +16,29 @@ export default function HomePage() {
 
     Promise.all([
       getNewestMovies(1),
+      getMoviesByCountry('han-quoc', 1),
+      getMoviesByCountry('trung-quoc', 1),
+      getMoviesByCountry('au-my', 1),
       getMoviesByType(MOVIE_TYPES.SERIES, 1),
       getMoviesByType(MOVIE_TYPES.MOVIE, 1),
       getMoviesByType(MOVIE_TYPES.ANIME, 1),
       getMoviesByType(MOVIE_TYPES.TV, 1),
     ])
-      .then(([newest, series, movies, anime, tv]) => {
+      .then(([newest, korea, china, usuk, series, movies, anime, tv]) => {
         if (cancelled) return
+
+        const pick = (res) =>
+          res?.data?.items || res?.items || []
+
         setData({
-          newest:                 newest.items || [],
-          [MOVIE_TYPES.SERIES]:   series.data?.items  || series.items  || [],
-          [MOVIE_TYPES.MOVIE]:    movies.data?.items  || movies.items  || [],
-          [MOVIE_TYPES.ANIME]:    anime.data?.items   || anime.items   || [],
-          [MOVIE_TYPES.TV]:       tv.data?.items      || tv.items      || [],
+          newest:  pick(newest),
+          korea:   pick(korea),
+          china:   pick(china),
+          usuk:    pick(usuk),
+          series:  pick(series),
+          movies:  pick(movies),
+          anime:   pick(anime),
+          tv:      pick(tv),
         })
       })
       .catch(() => {})
@@ -45,18 +48,83 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>
       <HeroBanner movies={data.newest || []} loading={loading} />
 
-      {CAROUSELS.map(({ key, title, browseLink }) => (
-        <MovieCarousel
-          key={key}
-          title={title}
-          movies={data[key] || []}
-          loading={loading}
-          browseLink={browseLink}
-        />
-      ))}
+      {/* Country sections */}
+      <MovieCarousel
+        title="Phim Hàn Quốc Mới"
+        movies={data.korea || []}
+        loading={loading}
+        browseLink="/quoc-gia/han-quoc"
+      />
+      <MovieCarousel
+        title="Phim Trung Quốc Mới"
+        movies={data.china || []}
+        loading={loading}
+        browseLink="/quoc-gia/trung-quoc"
+      />
+      <MovieCarousel
+        title="Phim US-UK Mới"
+        movies={data.usuk || []}
+        loading={loading}
+        browseLink="/quoc-gia/au-my"
+      />
+
+      {/* Divider */}
+      <div className="h-px mx-6 md:mx-12 my-2" style={{ background: 'rgba(255,255,255,0.06)' }} />
+
+      {/* Type sections */}
+      <MovieCarousel
+        title="Phim Bộ Mới"
+        movies={data.series || []}
+        loading={loading}
+        browseLink={`/browse?type=${MOVIE_TYPES.SERIES}`}
+      />
+
+      <Top10Carousel
+        title="Top 10 Phim Bộ Hôm Nay"
+        movies={(data.series || []).slice(0, 10)}
+        loading={loading}
+        browseLink={`/browse?type=${MOVIE_TYPES.SERIES}`}
+      />
+
+      <MovieCarousel
+        title="Phim Lẻ Mới"
+        movies={data.movies || []}
+        loading={loading}
+        browseLink={`/browse?type=${MOVIE_TYPES.MOVIE}`}
+      />
+
+      <Top10Carousel
+        title="Top 10 Phim Lẻ Hay Nhất"
+        movies={(data.movies || []).slice(0, 10)}
+        loading={loading}
+        browseLink={`/browse?type=${MOVIE_TYPES.MOVIE}`}
+      />
+
+      <MovieCarousel
+        title="Hoạt Hình Mới"
+        movies={data.anime || []}
+        loading={loading}
+        browseLink={`/browse?type=${MOVIE_TYPES.ANIME}`}
+      />
+
+      <MovieCarousel
+        title="TV Shows"
+        movies={data.tv || []}
+        loading={loading}
+        browseLink={`/browse?type=${MOVIE_TYPES.TV}`}
+      />
+
+      {/* Phim mới nhất tổng hợp */}
+      <div className="h-px mx-6 md:mx-12 my-2" style={{ background: 'rgba(255,255,255,0.06)' }} />
+      <MovieCarousel
+        title="Phim Mới Cập Nhật"
+        movies={data.newest || []}
+        loading={loading}
+        browseLink="/browse"
+      />
     </div>
   )
 }

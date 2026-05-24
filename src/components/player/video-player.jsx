@@ -155,8 +155,8 @@ export default function VideoPlayer({ src, title, onProgress, initialTime = 0 })
           <p className="text-white text-sm">{state.error}</p>
           <button
             onClick={(e) => { e.stopPropagation(); update({ error: null, isBuffering: true }); hlsRef.current?.startLoad() }}
-            className="px-4 py-2 text-sm font-medium text-white rounded-sm"
-            style={{ background: '#e50914' }}
+            className="px-4 py-2 text-sm font-medium rounded-sm"
+            style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)' }}
           >
             Thử lại
           </button>

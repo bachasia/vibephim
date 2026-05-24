@@ -17,7 +17,7 @@ export default function CountryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white pt-20">
+    <div className="min-h-screen pt-28 text-white" style={{ background: 'var(--bg-color)' }}>
       <div className="max-w-screen-xl mx-auto px-6 md:px-12">
         <h1 className="text-xl font-bold mb-6 text-white">
           {countryInfo || 'Quốc gia'}

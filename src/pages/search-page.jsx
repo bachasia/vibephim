@@ -59,14 +59,14 @@ export default function SearchPage() {
             className="w-full text-white transition-colors duration-200"
             style={{
               padding: '16px 48px 16px 52px',
-              background: '#232323',
+              background: 'var(--bg-2)',
               border: '2px solid rgba(255,255,255,0.2)',
               borderRadius: '8px',
               fontSize: '18px',
               fontFamily: 'inherit',
               outline: 'none',
             }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = '#e50914' }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--primary)' }}
             onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)' }}
           />
           {inputValue && (

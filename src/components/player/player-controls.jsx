@@ -57,7 +57,7 @@ export default function PlayerControls({
           {/* Buffer fill */}
           <div className="absolute inset-y-0 left-0 bg-white/30 rounded-full transition-all" style={{ width: `${bufferPct}%` }} />
           {/* Progress fill */}
-          <div className="absolute inset-y-0 left-0 rounded-full transition-all" style={{ width: `${progress}%`, background: '#e50914' }} />
+          <div className="absolute inset-y-0 left-0 rounded-full transition-all" style={{ width: `${progress}%`, background: 'var(--primary)' }} />
         </div>
 
         {/* Controls row */}

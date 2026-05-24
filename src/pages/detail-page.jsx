@@ -25,8 +25,8 @@ function Chip({ to, label }) {
         color: '#b3b3b3',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'rgba(229,9,20,0.15)'
-        e.currentTarget.style.borderColor = '#e50914'
+        e.currentTarget.style.background = 'rgba(255,216,117,0.1)'
+        e.currentTarget.style.borderColor = 'var(--primary)'
         e.currentTarget.style.color = '#ffffff'
       }}
       onMouseLeave={(e) => {
@@ -56,7 +56,7 @@ function MetaRow({ label, children }) {
 
 function DetailSkeleton() {
   return (
-    <div className="min-h-screen animate-pulse" style={{ background: '#000' }}>
+    <div className="min-h-screen animate-pulse" style={{ background: 'var(--bg-color)' }}>
       <SkeletonBanner />
       <div className="px-8 py-8 flex gap-8">
         <div className="shrink-0 rounded-sm" style={{ width: '180px', aspectRatio: '2/3', background: 'rgba(255,255,255,0.1)' }} />
@@ -84,7 +84,7 @@ export default function DetailPage() {
 
   if (error || !movie) {
     return (
-      <div className="min-h-screen pt-20 flex items-center justify-center" style={{ background: '#000' }}>
+      <div className="min-h-screen pt-28 flex items-center justify-center" style={{ background: 'var(--bg-color)' }}>
         <p className="text-sm" style={{ color: '#737373' }}>{error || 'Không tìm thấy phim.'}</p>
       </div>
     )
@@ -109,7 +109,7 @@ export default function DetailPage() {
   const firstEp = episodes?.[0]?.server_data?.[0]
 
   return (
-    <div className="min-h-screen text-white" style={{ background: '#000' }}>
+    <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>
       {/* Backdrop */}
       <div
         className="relative overflow-hidden"
@@ -126,14 +126,14 @@ export default function DetailPage() {
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to right, #000000 0%, transparent 50%)',
+            background: 'linear-gradient(to right, var(--bg-color) 0%, transparent 50%)',
           }}
         />
         {/* Gradient: bottom to top */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to top, #000000 0%, rgba(0,0,0,0.2) 60%, transparent 100%)',
+            background: 'linear-gradient(to top, var(--bg-color) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)',
           }}
         />
       </div>
@@ -173,7 +173,7 @@ export default function DetailPage() {
             {quality && (
               <span
                 className="font-mono text-[11px] font-bold px-3 py-1 rounded-sm"
-                style={{ background: '#e50914', color: '#fff' }}
+                style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)' }}
               >
                 {quality}
               </span>
@@ -181,7 +181,7 @@ export default function DetailPage() {
             {lang && (
               <span
                 className="font-mono text-[11px] font-bold px-3 py-1 rounded-sm"
-                style={{ background: '#2d2d2d', color: '#b3b3b3', border: '1px solid rgba(255,255,255,0.2)' }}
+                style={{ background: 'var(--bg-3)', color: 'var(--text-base)', border: '1px solid rgba(255,255,255,0.15)' }}
               >
                 {lang}
               </span>
@@ -189,7 +189,7 @@ export default function DetailPage() {
             {year && (
               <span
                 className="font-mono text-[11px] font-bold px-3 py-1 rounded-sm"
-                style={{ background: '#2d2d2d', color: '#b3b3b3', border: '1px solid rgba(255,255,255,0.2)' }}
+                style={{ background: 'var(--bg-3)', color: 'var(--text-base)', border: '1px solid rgba(255,255,255,0.15)' }}
               >
                 {year}
               </span>
@@ -197,7 +197,7 @@ export default function DetailPage() {
             {time && (
               <span
                 className="font-mono text-[11px] font-bold px-3 py-1 rounded-sm"
-                style={{ background: '#2d2d2d', color: '#b3b3b3', border: '1px solid rgba(255,255,255,0.2)' }}
+                style={{ background: 'var(--bg-3)', color: 'var(--text-base)', border: '1px solid rgba(255,255,255,0.15)' }}
               >
                 {time}
               </span>
@@ -257,7 +257,7 @@ export default function DetailPage() {
                 : navigate(`/phim/${slug}`)
               }
               className="inline-flex items-center gap-2 font-bold text-sm text-white transition-opacity hover:opacity-85"
-              style={{ background: '#e50914', padding: '10px 20px', borderRadius: '4px' }}
+              style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)', padding: '10px 20px', borderRadius: '4px' }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="5,3 19,12 5,21" />
@@ -271,9 +271,9 @@ export default function DetailPage() {
               style={{
                 padding: '10px 16px',
                 borderRadius: '4px',
-                background: favorited ? 'rgba(229,9,20,0.15)' : 'rgba(109,109,110,0.5)',
-                color: favorited ? '#e50914' : '#ffffff',
-                border: favorited ? '1px solid #e50914' : 'none',
+                background: favorited ? 'rgba(255,216,117,0.15)' : 'rgba(109,109,110,0.5)',
+                color: favorited ? 'var(--primary)' : '#ffffff',
+                border: favorited ? '1px solid var(--primary)' : 'none',
               }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill={favorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">

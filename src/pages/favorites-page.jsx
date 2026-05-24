@@ -9,7 +9,7 @@ function FavoriteCard({ movie, onRemove }) {
         <div
           className="relative overflow-hidden rounded-sm cursor-pointer"
           style={{
-            background: '#232323',
+            background: 'var(--bg-2)',
             transition: 'transform 400ms ease, box-shadow 400ms ease',
           }}
           onMouseEnter={(e) => {
@@ -38,7 +38,7 @@ function FavoriteCard({ movie, onRemove }) {
           {movie.quality && (
             <span
               className="absolute top-1.5 right-1.5 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded-sm uppercase leading-none"
-              style={{ background: '#e50914', color: '#fff' }}
+              style={{ background: 'var(--primary)', color: 'var(--primary-btn-text)' }}
             >
               {movie.quality}
             </span>
@@ -46,7 +46,7 @@ function FavoriteCard({ movie, onRemove }) {
         </div>
 
         {/* Info panel */}
-        <div className="px-2 pt-2 pb-3" style={{ background: '#232323' }}>
+        <div className="px-2 pt-2 pb-3" style={{ background: 'var(--bg-2)' }}>
           <p className="text-[13px] font-semibold truncate text-white">{movie.name}</p>
           {movie.year && (
             <p className="text-[11px] mt-0.5 font-mono" style={{ color: '#737373' }}>{movie.year}</p>
@@ -66,9 +66,9 @@ function FavoriteCard({ movie, onRemove }) {
           zIndex: 5,
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = '#e50914'
-          e.currentTarget.style.color = '#fff'
-          e.currentTarget.style.borderColor = '#e50914'
+          e.currentTarget.style.background = 'var(--primary)'
+          e.currentTarget.style.color = 'var(--primary-btn-text)'
+          e.currentTarget.style.borderColor = 'var(--primary)'
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.background = 'rgba(0,0,0,0.75)'
@@ -86,7 +86,7 @@ export default function FavoritesPage() {
   const { favorites, removeFavorite, clearFavorites } = useFavorites()
 
   return (
-    <div className="min-h-screen text-white" style={{ background: '#000' }}>
+    <div className="min-h-screen text-white" style={{ background: 'var(--bg-color)' }}>
       {/* Page title bar */}
       <div
         className="flex items-center justify-between px-8 pt-24 pb-5"
@@ -104,12 +104,12 @@ export default function FavoritesPage() {
             className="text-sm transition-all duration-200"
             style={{
               padding: '8px 16px',
-              border: '1px solid rgba(229,9,20,0.5)',
+              border: '1px solid rgba(255,216,117,0.5)',
               borderRadius: '2px',
               background: 'transparent',
-              color: '#e50914',
+              color: 'var(--primary)',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(229,9,20,0.12)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,216,117,0.1)' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
           >
             Xóa tất cả
@@ -122,7 +122,7 @@ export default function FavoritesPage() {
         {favorites.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-sm mb-4" style={{ color: '#737373' }}>Chưa có phim yêu thích nào.</p>
-            <Link to="/browse" className="text-sm font-medium" style={{ color: '#e50914' }}>
+            <Link to="/browse" className="text-sm font-medium" style={{ color: 'var(--primary)' }}>
               Khám phá phim →
             </Link>
           </div>
