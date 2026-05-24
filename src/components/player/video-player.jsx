@@ -122,12 +122,42 @@ export default function VideoPlayer({ src, title, onProgress, initialTime = 0 })
     return () => window.removeEventListener('keydown', onKey)
   }, [resetHideTimer]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Fullscreen change listener — syncs isFullscreen state (standard + webkit)
+  useEffect(() => {
+    const video = videoRef.current
+    function onFsChange() {
+      update({ isFullscreen: !!(document.fullscreenElement || document.webkitFullscreenElement) })
+    }
+    function onWebkitBegin() { update({ isFullscreen: true }) }
+    function onWebkitEnd()   { update({ isFullscreen: false }) }
+    document.addEventListener('fullscreenchange', onFsChange)
+    document.addEventListener('webkitfullscreenchange', onFsChange)
+    video?.addEventListener('webkitbeginfullscreen', onWebkitBegin)
+    video?.addEventListener('webkitendfullscreen', onWebkitEnd)
+    return () => {
+      document.removeEventListener('fullscreenchange', onFsChange)
+      document.removeEventListener('webkitfullscreenchange', onFsChange)
+      video?.removeEventListener('webkitbeginfullscreen', onWebkitBegin)
+      video?.removeEventListener('webkitendfullscreen', onWebkitEnd)
+    }
+  }, [update])
+
   function toggleFullscreen() {
+    const video = videoRef.current
     const el = containerRef.current
-    if (!document.fullscreenElement) {
-      el?.requestFullscreen().then(() => update({ isFullscreen: true })).catch(() => {})
+    // iOS Safari: requestFullscreen không hoạt động trên div, phải dùng video.webkitEnterFullscreen
+    if (video?.webkitEnterFullscreen && !document.fullscreenElement) {
+      if (video.webkitDisplayingFullscreen) {
+        video.webkitExitFullscreen()
+      } else {
+        video.webkitEnterFullscreen()
+      }
+      return
+    }
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      (el?.requestFullscreen?.() ?? el?.webkitRequestFullscreen?.())?.catch(() => {})
     } else {
-      document.exitFullscreen().then(() => update({ isFullscreen: false })).catch(() => {})
+      (document.exitFullscreen?.() ?? document.webkitExitFullscreen?.())?.catch(() => {})
     }
   }
 
