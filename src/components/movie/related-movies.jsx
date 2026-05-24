@@ -26,7 +26,7 @@ export default function RelatedMovies({ category = [], currentSlug }) {
   if (!movies.length) return null
 
   return (
-    <div className="mt-6">
+    <div className="mt-10">
       <h2 className="text-sm font-bold text-white mb-3 uppercase tracking-wide">Đề xuất cho bạn</h2>
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginBottom: '8px' }} />
       <div className="flex flex-col">

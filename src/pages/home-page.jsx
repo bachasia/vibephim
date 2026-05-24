@@ -127,6 +127,8 @@ export default function HomePage() {
         loading={loading}
         browseLink="/browse"
       />
+
+      <div className="pb-12" />
     </div>
   )
 }
