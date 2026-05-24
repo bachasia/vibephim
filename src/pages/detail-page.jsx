@@ -391,7 +391,7 @@ export default function DetailPage() {
             )}
 
             {/* Episodes */}
-            <EpisodeSection episodes={episodes} movieSlug={slug} />
+            <EpisodeSection episodes={episodes} movieSlug={slug} episodeTotal={episode_total} />
           </div>
         </div>
       </div>

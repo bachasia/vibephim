@@ -92,7 +92,7 @@ export default function WatchPage() {
           <div className="flex-1 min-w-0">
             <WatchMovieInfo movie={movie} slug={slug} currentEpName={currentEp?.name} />
             <div className="mt-2">
-              <EpisodeSection episodes={episodes} movieSlug={slug} currentEpSlug={ep} />
+              <EpisodeSection episodes={episodes} movieSlug={slug} currentEpSlug={ep} episodeTotal={movie?.episode_total} />
             </div>
             <WatchComments />
           </div>
