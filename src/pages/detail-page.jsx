@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react'
 import { useMovieDetail } from '../hooks/use-movie-detail.js'
 import { getImageUrl } from '../services/ophim-api.js'
 import EpisodeSection from '../components/movie/episode-section.jsx'
+import WatchComments from '../components/watch/watch-comments.jsx'
+import CastSection from '../components/movie/cast-section.jsx'
+import RelatedMovies from '../components/movie/related-movies.jsx'
 import { useFavorites } from '../contexts/favorites-context.jsx'
 import { SkeletonBanner } from '../components/ui/skeleton.jsx'
 import TrailerModal from '../components/ui/trailer-modal.jsx'
@@ -355,13 +358,14 @@ export default function DetailPage() {
                     <span>{director.join(', ')}</span>
                   </InfoLine>
                 )}
-                {actor?.length > 0 && actor[0] !== 'Đang cập nhật' && (
-                  <InfoLine label="Diễn viên">
-                    <span className="line-clamp-3">{actor.join(', ')}</span>
-                  </InfoLine>
-                )}
               </div>
             </div>
+
+            {/* Cast */}
+            <CastSection actors={actor} />
+
+            {/* Related movies */}
+            <RelatedMovies category={category} currentSlug={slug} />
           </div>
 
           {/* ── RIGHT MAIN (dc-main) ── */}
@@ -392,6 +396,9 @@ export default function DetailPage() {
 
             {/* Episodes */}
             <EpisodeSection episodes={episodes} movieSlug={slug} episodeTotal={episode_total} />
+
+            {/* Comments */}
+            <WatchComments />
           </div>
         </div>
       </div>

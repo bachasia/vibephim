@@ -4,7 +4,7 @@ function Tab({ label, active, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="px-4 py-1.5 text-sm font-medium rounded-sm transition-colors"
+      className="px-3 py-1 text-xs font-medium rounded-sm transition-colors"
       style={active
         ? { background: 'var(--primary)', color: 'var(--primary-btn-text)' }
         : { background: 'var(--bg-3)', color: 'var(--text-base)' }
@@ -23,12 +23,12 @@ export default function WatchComments() {
   return (
     <div className="mt-8">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="flex items-center gap-1.5">
-          <svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" style={{ color: 'var(--primary)' }}>
+          <svg width="14" height="14" viewBox="0 0 512 512" fill="currentColor" style={{ color: 'var(--primary)' }}>
             <path d="M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 4.8-49.1 20.2-52.2 21.3c-15.6 5.8-31.7-7.4-28.2-23.8l10.1-58.4C14.2 320.1 0 281.5 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z"/>
           </svg>
-          <span className="font-bold text-white">Bình luận (0)</span>
+          <span className="text-sm font-bold text-white">Bình luận (0)</span>
         </div>
         <div className="flex gap-1.5">
           <Tab label="Bình luận" active={tab === 'comment'} onClick={() => setTab('comment')} />
