@@ -103,31 +103,31 @@ export default function Header() {
           <VibephimLogo iconSize={28} fontSize={18} />
         </Link>
 
-        {/* Search bar — always visible */}
-        <InlineSearch className="hidden md:block md:flex-none md:w-64 lg:w-80 xl:w-96" />
+        {/* Center: search + nav — flex-1 so it fills space, auth stays visible */}
+        <div className="hidden md:flex items-center gap-3 flex-1 min-w-0">
+          <InlineSearch className="flex-none w-52" />
+          <nav className="flex items-center gap-0.5 ml-auto flex-shrink-0">
+            {NAV_LINKS.map((link) => {
+              const active = isActive(link, pathname, currentType)
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="px-2 py-1.5 rounded text-sm transition-colors duration-200 whitespace-nowrap"
+                  style={{ color: active ? 'var(--primary)' : '#b3b3b3', fontWeight: active ? '600' : '400' }}
+                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = '#fff' }}
+                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = '#b3b3b3' }}
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
+            <NavDropdown label="Thể Loại" items={CATEGORIES} columns={3} />
+            <NavDropdown label="Quốc Gia" items={COUNTRIES} columns={3} />
+          </nav>
+        </div>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-0.5 ml-auto flex-shrink-0">
-          {NAV_LINKS.map((link) => {
-            const active = isActive(link, pathname, currentType)
-            return (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="px-3 py-1.5 rounded text-sm transition-colors duration-200 whitespace-nowrap"
-                style={{ color: active ? 'var(--primary)' : '#b3b3b3', fontWeight: active ? '600' : '400' }}
-                onMouseEnter={(e) => { if (!active) e.currentTarget.style.color = '#fff' }}
-                onMouseLeave={(e) => { if (!active) e.currentTarget.style.color = '#b3b3b3' }}
-              >
-                {link.label}
-              </Link>
-            )
-          })}
-          <NavDropdown label="Thể Loại" items={CATEGORIES} columns={3} />
-          <NavDropdown label="Quốc Gia" items={COUNTRIES} columns={3} />
-        </nav>
-
-        {/* Desktop icon actions */}
+        {/* Desktop icon actions — flex-shrink-0 so auth button is always visible */}
         <div className="hidden md:flex items-center gap-1 flex-shrink-0">
           <Link to="/yeu-thich" aria-label="Yêu thích"
             className="w-9 h-9 flex items-center justify-center rounded transition-colors"
