@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { MOVIE_TYPES } from '../../utils/constants.js'
 import VibephimLogo from '../ui/vibephim-logo.jsx'
 import NavDropdown from './nav-dropdown.jsx'
 import InlineSearch from '../search/inline-search.jsx'
+import { useAuth } from '../../contexts/auth-context.jsx'
+import AuthModal from '../auth/auth-modal.jsx'
 
 const CATEGORIES = [
   { label: 'Hành Động', to: '/the-loai/hanh-dong' },
@@ -52,10 +54,23 @@ function isActive(link, pathname, currentType) {
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [authOpen, setAuthOpen] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
+  const { user, signOut } = useAuth()
   const { pathname, search } = useLocation()
   const currentType = new URLSearchParams(search).get('type') || ''
 
-  useEffect(() => { setMenuOpen(false) }, [pathname])
+  useEffect(() => { setMenuOpen(false); setAuthOpen(false) }, [pathname])
+
+  useEffect(() => {
+    if (!dropdownOpen) return
+    function onOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false)
+    }
+    document.addEventListener('mousedown', onOutside)
+    return () => document.removeEventListener('mousedown', onOutside)
+  }, [dropdownOpen])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
@@ -134,6 +149,46 @@ export default function Header() {
               <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
             </svg>
           </Link>
+
+          {/* Auth: login button or user avatar */}
+          {user ? (
+            <div ref={dropdownRef} className="relative ml-1">
+              <button
+                onClick={() => setDropdownOpen((v) => !v)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-opacity"
+                style={{ background: 'var(--primary)', color: 'var(--primary-btn-text, #fff)' }}
+                aria-label="Tài khoản"
+              >
+                {(user.email?.[0] ?? '?').toUpperCase()}
+              </button>
+              {dropdownOpen && (
+                <div
+                  className="absolute right-0 top-full mt-2 w-44 rounded-xl py-1 shadow-lg z-10"
+                  style={{ background: 'var(--bg-2)', border: '1px solid var(--border-color)' }}
+                >
+                  <p className="text-xs px-3 py-2 truncate" style={{ color: 'var(--text-muted)' }}>{user.email}</p>
+                  <div style={{ height: '1px', background: 'var(--border-color)' }} />
+                  <button
+                    onClick={() => { signOut(); setDropdownOpen(false) }}
+                    className="w-full text-left text-sm px-3 py-2 transition-colors"
+                    style={{ color: 'var(--text-base)' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--primary)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-base)' }}
+                  >
+                    Đăng xuất
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => setAuthOpen(true)}
+              className="ml-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+              style={{ background: 'var(--primary)', color: 'var(--primary-btn-text, #fff)' }}
+            >
+              Đăng nhập
+            </button>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -191,8 +246,30 @@ export default function Header() {
               ))}
             </div>
           </div>
+
+          {/* Mobile auth */}
+          <div className="pt-2 border-t" style={{ borderColor: 'var(--border-color)' }}>
+            {user ? (
+              <div className="flex items-center justify-between">
+                <span className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{user.email}</span>
+                <button onClick={signOut} className="text-xs px-3 py-1 rounded-lg" style={{ background: 'var(--bg-3)', color: 'var(--text-muted)' }}>
+                  Đăng xuất
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => { setAuthOpen(true); setMenuOpen(false) }}
+                className="w-full py-2 rounded-lg text-sm font-medium"
+                style={{ background: 'var(--primary)', color: 'var(--primary-btn-text, #fff)' }}
+              >
+                Đăng nhập
+              </button>
+            )}
+          </div>
         </nav>
       )}
+
+      {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
     </header>
   )
 }

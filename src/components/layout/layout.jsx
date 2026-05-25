@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import Header from './header.jsx'
 import Footer from './footer.jsx'
 import MobileBottomNav from './mobile-bottom-nav.jsx'
+import MigrationPrompt from '../auth/migration-prompt.jsx'
 
 export default function Layout() {
   return (
@@ -12,6 +13,7 @@ export default function Layout() {
       </main>
       <Footer />
       <MobileBottomNav />
+      <MigrationPrompt />
     </>
   )
 }

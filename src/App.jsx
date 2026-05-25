@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './contexts/auth-context.jsx'
 import { FavoritesProvider } from './contexts/favorites-context.jsx'
 import { WatchHistoryProvider } from './contexts/watch-history-context.jsx'
 import ErrorBoundary from './components/ui/error-boundary.jsx'
@@ -29,6 +30,7 @@ function PageLoader() {
 export default function App() {
   return (
     <ErrorBoundary>
+      <AuthProvider>
       <FavoritesProvider>
         <WatchHistoryProvider>
           <BrowserRouter>
@@ -52,6 +54,7 @@ export default function App() {
           </BrowserRouter>
         </WatchHistoryProvider>
       </FavoritesProvider>
+      </AuthProvider>
     </ErrorBoundary>
   )
 }
