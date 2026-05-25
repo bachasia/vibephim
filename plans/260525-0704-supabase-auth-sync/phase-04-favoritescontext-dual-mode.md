@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "FavoritesContext Dual-mode"
-status: pending
+status: completed
 priority: P1
 effort: "1.5h"
 dependencies: [2]

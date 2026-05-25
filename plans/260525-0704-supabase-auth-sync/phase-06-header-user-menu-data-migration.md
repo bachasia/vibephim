@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Header User Menu & Data Migration"
-status: pending
+status: completed
 priority: P2
 effort: "1h"
 dependencies: [3, 4, 5]

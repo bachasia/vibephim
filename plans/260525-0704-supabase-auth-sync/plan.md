@@ -1,7 +1,7 @@
 ---
 title: "Supabase Auth + Sync Favorites & History"
 description: "Add email/password auth via Supabase. Favorites and watch history sync to cloud when logged in; fall back to localStorage for guests."
-status: pending
+status: completed
 priority: P2
 branch: "main"
 tags: [auth, supabase, sync, favorites, history]
@@ -34,12 +34,12 @@ Thêm đăng ký / đăng nhập email+password bằng Supabase. Khi đã login,
 
 | Phase | Name | Status | Effort |
 |-------|------|--------|--------|
-| 1 | [Supabase Setup & Schema](./phase-01-supabase-setup-schema.md) | Pending | 1h |
-| 2 | [Supabase Client & AuthContext](./phase-02-supabase-client-authcontext.md) | Pending | 1h |
-| 3 | [Login/Register Modal UI](./phase-03-login-register-modal-ui.md) | Pending | 2h |
-| 4 | [FavoritesContext Dual-mode](./phase-04-favoritescontext-dual-mode.md) | Pending | 1.5h |
-| 5 | [WatchHistoryContext Dual-mode](./phase-05-watchhistorycontext-dual-mode.md) | Pending | 1.5h |
-| 6 | [Header User Menu & Data Migration](./phase-06-header-user-menu-data-migration.md) | Pending | 1h |
+| 1 | [Supabase Setup & Schema](./phase-01-supabase-setup-schema.md) | Completed | 1h |
+| 2 | [Supabase Client & AuthContext](./phase-02-supabase-client-authcontext.md) | Completed | 1h |
+| 3 | [Login/Register Modal UI](./phase-03-login-register-modal-ui.md) | Completed | 2h |
+| 4 | [FavoritesContext Dual-mode](./phase-04-favoritescontext-dual-mode.md) | Completed | 1.5h |
+| 5 | [WatchHistoryContext Dual-mode](./phase-05-watchhistorycontext-dual-mode.md) | Completed | 1.5h |
+| 6 | [Header User Menu & Data Migration](./phase-06-header-user-menu-data-migration.md) | Completed | 1h |
 
 **Total:** ~8h
 

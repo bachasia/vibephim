@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Supabase Client & AuthContext"
-status: pending
+status: completed
 priority: P1
 effort: "1h"
 dependencies: [1]

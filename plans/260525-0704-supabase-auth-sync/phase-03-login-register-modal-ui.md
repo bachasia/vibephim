@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Login/Register Modal UI"
-status: pending
+status: completed
 priority: P1
 effort: "2h"
 dependencies: [2]
